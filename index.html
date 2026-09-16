@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
 <title>Enter The Grey Room</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -18,7 +24,7 @@
     font-family: var(--sans);
     font-weight: 300;
     margin: 0;
-    padding: 0 20px;
+    padding: 0 max(20px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(20px, env(safe-area-inset-left));
     -webkit-font-smoothing: antialiased;
     position: relative;
   }
@@ -140,6 +146,8 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+</head>
+<body>
 
 <div class="grid-bg" aria-hidden="true"></div>
 
@@ -399,3 +407,5 @@
     wa.scrollIntoView({ block: "center", behavior: "smooth" });
   });
 </script>
+</body>
+</html>
