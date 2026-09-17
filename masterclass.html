@@ -52,6 +52,25 @@
   .home{display:inline-block;text-decoration:none;color:inherit;width:fit-content;}
   .home:hover .mark,.home:focus-visible .mark{opacity:.62;}
   .home:focus-visible{outline:2px solid var(--ink);outline-offset:6px;}
+  /* small social line, left column */
+  .ig{display:inline-block;margin-top:18px;font-family:var(--mono);font-size:10.5px;
+      font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+      text-decoration:none;transition:color .14s linear;}
+  .ig:hover,.ig:focus-visible{color:var(--ink);}
+  /* an artist name you can click through to: the name becomes its own small
+     grey mass, the same move the posters make at full scale */
+  .artist{color:var(--ink);text-decoration:none;background:#55555A;
+          padding:2px 8px 3px;margin:0 1px;white-space:nowrap;
+          transition:background .15s linear,color .15s linear;}
+  .artist:hover,.artist:focus-visible{background:var(--ink);color:var(--black);}
+  .artist:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  /* artist handles inside an event card */
+  .handles{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:14px;}
+  .handles a{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.12em;
+             text-transform:uppercase;color:rgba(242,241,237,.72);text-decoration:none;
+             border-bottom:1px solid rgba(242,241,237,.28);padding-bottom:2px;
+             transition:color .14s linear,border-color .14s linear;}
+  .handles a:hover{color:var(--ink);border-color:var(--ink);}
   .home-hint{display:block;margin-top:9px;font-family:var(--mono);font-size:10px;
     font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);
     opacity:0;transition:opacity .14s linear;}
@@ -198,6 +217,23 @@
                  font-size:1rem;line-height:1.1;}
   @media (max-width:430px){.mc-facts{grid-template-columns:1fr;}}
 
+  /* undated formats — quieter than a dated event */
+  .also{border:1px solid var(--line);margin-bottom:18px;}
+  .also-top{padding:16px 18px 0;}
+  .also-when{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+             text-transform:uppercase;color:var(--dim);display:block;margin-bottom:7px;}
+  .also-top h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;
+               font-size:1.35rem;line-height:1.05;margin:0;}
+  .also-body{padding:12px 18px 18px;}
+  .also-body p{margin:0 0 12px;font-size:.97rem;line-height:1.55;opacity:.85;}
+  .also-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;
+            text-transform:uppercase;color:var(--dim);opacity:1 !important;}
+  .also-btn{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.13em;
+            text-transform:uppercase;background:var(--grey);color:var(--ink);
+            border:0;padding:10px 14px;cursor:pointer;
+            transition:background .15s linear,color .15s linear;}
+  .also-btn:hover{background:var(--ink);color:var(--black);}
+
   .poster{display:block;width:100%;height:auto;border-bottom:1px solid var(--line);}
 
   /* past ones — quieter */
@@ -223,6 +259,7 @@
     </div>
     <p class="stand">Working artists on the parts of the job a syllabus leaves out.
       Once a month, at The Grey Room. Free to attend, and the room only holds so many.</p>
+    <a class="ig" href="https://www.instagram.com/thegreyroom.in/" target="_blank" rel="noopener">@thegreyroom.in &#8599;</a>
     <div class="spec"><div><b>Format</b><span>In person</span></div><div><b>How often</b><span>Monthly</span></div><div><b>Entry</b><span>Free</span></div><div><b>Where</b><span>Gurugram</span></div></div>
   </div>
   </div>
@@ -239,7 +276,7 @@
       <div class="mc-top">
         <span class="mc-when">Next &middot; Saturday 27 September</span>
         <h3>Surviving the Industry</h3>
-        <p class="mc-with">With Major Minor &mdash; Chitralekha Sen &amp; Mukul Bhatt</p>
+        <p class="mc-with">With <a class="artist" href="https://www.instagram.com/majorminor.wav/" target="_blank" rel="noopener">Major Minor</a> &mdash; Chitralekha Sen &amp; Mukul Bhatt</p>
       </div>
       <div class="mc-body">
         <div class="mc-facts"><div><b>Date</b><span>27 Sept 2026</span></div><div><b>Time</b><span>3PM onwards</span></div><div><b>Where</b><span>The Grey Room &middot; Gurugram</span></div><div><b>Entry</b><span>Free &middot; limited seats</span></div></div>
@@ -250,6 +287,19 @@
     <p class="stand" style="margin:0;font-size:.95rem;">
       Seats are limited by the size of the room, not by a sales tactic. RSVP below
       and we will message you on WhatsApp to confirm.
+    </p>
+  </section>
+
+  <hr>
+
+  <section id="more">
+    <div class="sec-head"><h2>Also in the room</h2><span class="fill"></span>
+      <span class="tag">No date yet</span></div>
+    <div class="also">  <div class="also-top">    <span class="also-when">Date to be announced</span>    <h3>Open Decks</h3>  </div>  <div class="also-body">    <p>Open to anyone, not only people on a course. Slots are booked in advance so the night runs to a timetable &mdash; you get a proper set on club gear, in a room with people actually listening.</p>    <p class="also-tag">Sign up in advance</p>    <button type="button" class="also-btn" data-event="Open Decks">      Register interest</button>  </div></div><div class="also">  <div class="also-top">    <span class="also-when">Date to be announced</span>    <h3>Open Collab Days</h3>  </div>  <div class="also-body">    <p>You get paired with someone and you start something new that day. Not notes on a track you already have &mdash; a track that did not exist when you walked in.</p>    <p class="also-tag">Paired on the day</p>    <button type="button" class="also-btn" data-event="Open Collab Days">      Register interest</button>  </div></div>
+    <p class="stand" style="margin:0;font-size:.95rem;">
+      These run when we schedule them rather than on a fixed cycle. Register your
+      interest and you hear first &mdash; dates also go out in The Grey Room Circle
+      before anywhere else.
     </p>
   </section>
 
@@ -272,10 +322,20 @@
     <div class="sec-head"><h2>RSVP</h2><span class="fill"></span>
       <span class="tag">Takes a minute</span></div>
     <p class="stand" style="margin:0 0 22px;font-size:.95rem;">
-      Two lines and you are on the list. We will message you on WhatsApp to confirm
-      your seat and send the address.</p>
+      Two lines and you are on the list. For the dated masterclass we confirm your
+      seat and send the address. For the other two we message you the moment there
+      is a date.</p>
 
     <form id="reg" novalidate>
+      <div class="field">
+        <label for="f-event">What for</label>
+        <select id="f-event" name="event">
+          <option value="Surviving the Industry - Major Minor - 27 Sept 2026">Surviving the Industry &mdash; 27 Sept</option>
+          <option value="Open Decks - interest">Open Decks &mdash; tell me when</option>
+          <option value="Open Collab Days - interest">Open Collab Days &mdash; tell me when</option>
+        </select>
+      </div>
+
       <div class="field">
         <label for="f-name">Name</label>
         <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
@@ -310,6 +370,19 @@
   var SHEET_ENDPOINT  = "https://script.google.com/macros/s/AKfycbxrOCpE4qbX4s8pcHi2wt3LYliUhLPc9-1doybm3ppGMvZYNitX39Ofb4dK06j6IxHrrQ/exec";
   var MASTERCLASS     = "Surviving the Industry - Major Minor - 27 Sept 2026";
 
+  // the two undated blocks preselect themselves in the form
+  document.querySelectorAll(".also-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var sel = document.getElementById("f-event");
+      var want = btn.getAttribute("data-event");
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value.indexOf(want) === 0) { sel.selectedIndex = i; break; }
+      }
+      document.getElementById("rsvp").scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("f-name").focus({ preventScroll: true });
+    });
+  });
+
   var form      = document.getElementById("reg");
   var statusBox = document.getElementById("status");
   var hint      = document.getElementById("hint");
@@ -323,13 +396,14 @@
     var name  = document.getElementById("f-name").value.trim();
     var phone = document.getElementById("f-phone").value.trim();
     var role  = document.getElementById("f-role").value;
+    var what  = document.getElementById("f-event").value;
 
     if (!name || !phone) { show("Add your name and number first."); return; }
 
     var entry = {
       type: "masterclass",
       name: name, phone: phone,
-      masterclass: MASTERCLASS, role: role,
+      masterclass: what, role: role,
       submittedAt: new Date().toISOString()
     };
 
@@ -344,9 +418,9 @@
     }
 
     var lines = [
-      "Masterclass RSVP - The Grey Room",
+      "The Grey Room - RSVP",
       "",
-      "Masterclass: " + MASTERCLASS,
+      "For: " + what,
       "Name: " + name,
       "Phone: " + phone,
       "I am: " + role

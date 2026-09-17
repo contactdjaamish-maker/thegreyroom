@@ -52,6 +52,25 @@
   .home{display:inline-block;text-decoration:none;color:inherit;width:fit-content;}
   .home:hover .mark,.home:focus-visible .mark{opacity:.62;}
   .home:focus-visible{outline:2px solid var(--ink);outline-offset:6px;}
+  /* small social line, left column */
+  .ig{display:inline-block;margin-top:18px;font-family:var(--mono);font-size:10.5px;
+      font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+      text-decoration:none;transition:color .14s linear;}
+  .ig:hover,.ig:focus-visible{color:var(--ink);}
+  /* an artist name you can click through to: the name becomes its own small
+     grey mass, the same move the posters make at full scale */
+  .artist{color:var(--ink);text-decoration:none;background:#55555A;
+          padding:2px 8px 3px;margin:0 1px;white-space:nowrap;
+          transition:background .15s linear,color .15s linear;}
+  .artist:hover,.artist:focus-visible{background:var(--ink);color:var(--black);}
+  .artist:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  /* artist handles inside an event card */
+  .handles{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:14px;}
+  .handles a{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.12em;
+             text-transform:uppercase;color:rgba(242,241,237,.72);text-decoration:none;
+             border-bottom:1px solid rgba(242,241,237,.28);padding-bottom:2px;
+             transition:color .14s linear,border-color .14s linear;}
+  .handles a:hover{color:var(--ink);border-color:var(--ink);}
   .home-hint{display:block;margin-top:9px;font-family:var(--mono);font-size:10px;
     font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);
     opacity:0;transition:opacity .14s linear;}
@@ -188,6 +207,7 @@
       <h1>How to sing vocals on electronic music.</h1>
     </div>
     <p class="stand">Three months, taught online, for people who want to put their voice on an electronic track and have it actually work. Melody, lyrics, phrasing and vocal arrangement &mdash; taught on real instrumentals from the first session.</p>
+    <a class="ig" href="https://www.instagram.com/thegreyroom.in/" target="_blank" rel="noopener">@thegreyroom.in &#8599;</a>
     <div class="spec"><div><b>Duration</b><span>3 months</span></div><div><b>Format</b><span>Online</span></div><div><b>Taught by</b><span>Shreya Bajpai</span></div><div><b>Where</b><span>Anywhere</span></div></div>
   </div>
   </div>
