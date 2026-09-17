@@ -374,6 +374,44 @@
     prefer("link-vocals", TOP_BROCHURE, TOP_FALLBACK);
   })();
 
+  // ---- "Where you're at" follows the course they picked -------------------
+  // Same order as the course <select>. Asking a singer whether they have
+  // touched a deck reads as a form nobody thought about.
+  var LEVELS = [
+    // DJ
+    ["Never touched a deck", "Bedroom, self-taught", "Played a few gigs", "Playing regularly"],
+    // Music production
+    ["Never opened a DAW", "Made a few loops", "Finishing tracks already", "Released something"],
+    // Vocals on electronic music
+    ["I sing, but never to a track", "I write songs", "I produce and want to write my own vocals", "Starting from scratch"],
+    // More than one of these
+    ["Complete beginner", "Self-taught so far", "Some experience", "Doing this already"],
+    // Not sure yet
+    ["Complete beginner", "Self-taught so far", "Some experience", "Doing this already"]
+  ];
+
+  (function () {
+    var courseSel = document.getElementById("f-course");
+    var levelSel  = document.getElementById("f-level");
+    if (!courseSel || !levelSel) { return; }
+
+    var fill = function () {
+      var set = LEVELS[courseSel.selectedIndex] || LEVELS[0];
+      var previous = levelSel.value;
+      levelSel.innerHTML = "";
+      for (var i = 0; i < set.length; i++) {
+        var o = document.createElement("option");
+        o.textContent = set[i];
+        levelSel.appendChild(o);
+      }
+      // keep their answer if it still exists in the new set
+      if (set.indexOf(previous) !== -1) { levelSel.value = previous; }
+    };
+
+    courseSel.addEventListener("change", fill);
+    fill();
+  })();
+
   var form   = document.getElementById("reg");
   var statusBox = document.getElementById("status");
   var hint   = document.getElementById("hint");
