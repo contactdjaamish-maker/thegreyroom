@@ -131,6 +131,10 @@
   .ig-chip:hover, .ig-chip:focus-visible { background:var(--ink); color:var(--black); }
   .ig-chip:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
   .bar.ghost { background: transparent; border-color: var(--line); }
+  .bar.arch { margin-block: 26px; }
+  .bar.arch .label { font-family: var(--mono); font-size: 12px; font-weight: 500;
+                     letter-spacing: .22em; }
+  .bar.arch .note { opacity: .5; letter-spacing: .3em; }
   .bar.ghost:hover, .bar.ghost:focus-visible { background: var(--grey); border-color: var(--ink); }
 
   /* registration — laid out like a spec sheet */
@@ -188,6 +192,8 @@
     display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
     padding-top: 26px; border-top: 1px solid var(--line);
   }
+  /* the colophon: standing facts about where else this room exists */
+  .colo { display: inline-flex; gap: 8px; align-items: baseline; }
   a.fine.ig { color: var(--ink); text-decoration: none;
               transition: opacity .14s linear; }
   a.fine.ig:hover, a.fine.ig:focus-visible { opacity: 1; }
@@ -257,6 +263,16 @@
 
     </div>
   </section>
+
+  <hr class="rule">
+
+  <a class="bar ghost arch" id="link-archive" href="archive.html">
+    <span>
+      <span class="label">Archive 01</span>
+      <span class="note" aria-hidden="true">&mdash;</span>
+    </span>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
+  </a>
 
   <hr class="rule">
 
@@ -352,7 +368,11 @@
 
   <footer>
     <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
-    <a class="fine ig" href="https://www.instagram.com/thegreyroom.in/" target="_blank" rel="noopener">@thegreyroom.in</a>
+    <span class="colo">
+      <a class="fine ig" href="archive.html">Archive 01</a>
+      <span class="fine" aria-hidden="true">&middot;</span>
+      <a class="fine ig" href="https://www.instagram.com/thegreyroom.in/" target="_blank" rel="noopener">@thegreyroom.in</a>
+    </span>
   </footer>
 
 </div>
@@ -371,9 +391,6 @@
   var DJ_BROCHURE    = "brochure-dj.html";
   var PROD_BROCHURE  = "brochure-production.html";
   var TOP_BROCHURE   = "brochure-toplining.html";
-  var DJ_FALLBACK    = "https://claude.ai/artifact/N4yVijsdWwf76rBdEcQDzh";
-  var PROD_FALLBACK  = "https://claude.ai/artifact/UpcRyMeUu9j9k9Bospy9dt";
-  var TOP_FALLBACK   = "https://claude.ai/artifact/3PXZ1xKxQk7B7XdNY4YzGP";
 
   // 4. Where enquiries get recorded. Paste the Google Apps Script web-app
   //    URL here and every submission is written to your sheet as a row.
@@ -395,31 +412,21 @@
     };
     wire("link-circle", CIRCLE_LINK);
 
-    // Point each course at the hosted copy first so it always works, then
-    // upgrade to the local file if that file is actually sitting beside us.
-    var prefer = function (id, localFile, fallback) {
+    // Every brochure lives beside this page in the repo, so point straight
+    // at it. An earlier version defaulted to a hosted copy and only
+    // "upgraded" to the local file after a fetch resolved - which meant the
+    // site quietly served a frozen old brochure. Never again: one source.
+    var local = function (id, file) {
       var el = document.getElementById(id);
       if (!el) { return; }
-      wire(id, fallback);
-      try {
-        fetch(localFile, { method: "GET" })
-          .then(function (r) { return r.ok ? r.text() : null; })
-          .then(function (text) {
-            if (text && text.indexOf("The Grey Room") !== -1) {
-              el.href = localFile;
-              el.removeAttribute("target");
-            }
-          })
-          .catch(function () { /* stay on the fallback */ });
-      } catch (err) { /* stay on the fallback */ }
+      el.href = file;
+      el.removeAttribute("target");
     };
 
-    var mc = document.getElementById("link-mc");
-    if (mc) { mc.href = "masterclass.html"; mc.removeAttribute("target"); }
-
-    prefer("link-dj", DJ_BROCHURE, DJ_FALLBACK);
-    prefer("link-prod", PROD_BROCHURE, PROD_FALLBACK);
-    prefer("link-vocals", TOP_BROCHURE, TOP_FALLBACK);
+    local("link-mc", "masterclass.html");
+    local("link-dj", DJ_BROCHURE);
+    local("link-prod", PROD_BROCHURE);
+    local("link-vocals", TOP_BROCHURE);
   })();
 
   // ---- "Where you're at" follows the course they picked -------------------
