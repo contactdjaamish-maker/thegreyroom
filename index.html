@@ -223,6 +223,8 @@
   .tnote b { color: var(--ink); font-weight: 500; }
   .dtabs button:hover { color: var(--ink); background: var(--black); }
   .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
+  .btabs { grid-template-columns: repeat(2, 1fr); }
+  .btabs button { padding: 9px 4px; }
   /* The door. The second record in ROOM is a way in. Nothing gives it away:
      no hover, no hand cursor, no tap flash. Students are told once. */
   .logo-wrap { position: relative; display: block; width: max-content; max-width: 100%; line-height: 0; }
@@ -353,6 +355,7 @@
           <label for="f-city">City</label>
           <select id="f-city" name="city">
             <option>Gurugram</option>
+            <option>Noida</option>
             <option>Elsewhere in Delhi NCR</option>
             <option>Outside Delhi NCR</option>
           </select>
@@ -383,6 +386,7 @@
 
       <div class="pick" id="pick" hidden>
         <label>Pick a time &middot; next three days</label>
+        <div class="dtabs btabs" id="btabs" role="tablist" hidden></div>
         <div class="dtabs" id="dtabs" role="tablist"></div>
         <div class="tslots" id="tslots"></div>
         <p class="tnote" id="tnote">Longer-range times go to our students first.</p>
@@ -402,7 +406,7 @@
   <hr class="rule">
 
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram</span>
+    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
     <span class="colo">
       <a class="fine ig" href="archive.html">Archive 01</a>
       <span class="fine" aria-hidden="true">&middot;</span>
@@ -433,6 +437,7 @@
   //    just are not recorded anywhere.
   var SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbxrOCpE4qbX4s8pcHi2wt3LYliUhLPc9-1doybm3ppGMvZYNitX39Ofb4dK06j6IxHrrQ/exec";
   var ROOM_ENDPOINT  = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec";
+  var BRANCHES = [];   // [] = one studio, no toggle. ["Gurugram","Noida"] = toggle on.
   // =====================================================================
 
   (function () {
@@ -514,7 +519,7 @@
   // Stays switched off until ROOM_ENDPOINT is set, and switches itself off if
   // the calendar can't be reached - the form then works exactly as before.
   var TRIAL = (function () {
-    var on = false, days = [], cur = 0, pick = null;
+    var on = false, days = [], cur = 0, pick = null, branch = null;
     var D = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var L = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     var M = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
@@ -541,28 +546,46 @@
       hint.textContent = use ? "The time is yours the moment you book. WhatsApp opens so you can say hello."
                              : "Opens WhatsApp with your details filled in. Nothing is posted publicly.";
     }
+    // Branches. Hidden until BRANCHES lists more than one. A slot belongs to
+    // the branch its Schedule row names; the rest show struck through.
+    function multi() { return BRANCHES && BRANCHES.length > 1; }
+    function where(s, d) { return s.at || d.at; }
+    function drawBranches() {
+      var bt = $("btabs"); bt.hidden = !multi(); if (!multi()) return;
+      bt.innerHTML = "";
+      BRANCHES.forEach(function (name) {
+        var b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab");
+        b.setAttribute("aria-selected", name === branch ? "true" : "false"); b.textContent = name;
+        b.addEventListener("click", function () { if (branch !== name) { branch = name; pick = null; $("tnote").textContent = "Longer-range times go to our students first."; firstOpen(); draw(); } });
+        bt.appendChild(b);
+      });
+    }
+    function mine(s, d) { return !multi() || where(s, d) === branch; }
+    function firstOpen() {
+      for (var i = 0; i < days.length; i++) if (days[i].slots.some(function (s) { return s.ok && mine(s, days[i]); })) { cur = i; return; }
+    }
     function draw() {
+      drawBranches();
       var tabs = $("dtabs"), box = $("tslots"); tabs.innerHTML = ""; box.innerHTML = "";
       days.forEach(function (d, i) {
         var b = document.createElement("button"), dt = new Date(d.date + "T00:00");
         b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", i === cur ? "true" : "false");
         b.innerHTML = (i === 0 ? "Today" : i === 1 ? "Tomorrow" : D[dt.getDay()] + " " + dt.getDate()) +
-                      "<small>" + (d.at || "Closed") + "</small>";
+                      "<small>" + (multi() ? (d.slots.some(function (s) { return mine(s, d); }) ? "Open" : "Closed") : (d.at || "Closed")) + "</small>";
         b.addEventListener("click", function () { cur = i; draw(); });
         tabs.appendChild(b);
       });
       var day = days[cur];
-      if (!day || !day.slots.length) { box.innerHTML = '<p class="tnote" style="grid-column:1/-1">Closed</p>'; return; }
+      if (!day || !day.slots.some(function (s) { return mine(s, day); })) { box.innerHTML = '<p class="tnote" style="grid-column:1/-1">Closed</p>'; return; }
       var any = false;
       day.slots.forEach(function (s) {
         var b = document.createElement("button"); b.type = "button"; b.className = "tslot"; b.textContent = hr(s.hour);
+        if (!mine(s, day)) return;
         if (!s.ok) b.disabled = true; else any = true;
         if (pick && pick.id === s.id) b.classList.add("sel");
         b.addEventListener("click", function () {
-          pick = { id: s.id, date: day.date, hour: s.hour, at: day.at };
+          pick = { id: s.id, date: day.date, hour: s.hour, at: where(s, day) };
           statusBox.hidden = true;
-          var city = $("f-city");
-          for (var k = 0; k < city.options.length; k++) if (city.options[k].text === day.at) city.selectedIndex = k;
           $("tnote").innerHTML = "<b>" + when(pick) + "</b>";
           draw();
         });
@@ -577,11 +600,16 @@
         days = r.days;
         on = days.some(function (d) { return d.slots.some(function (s) { return s.ok; }); });
         if (pick && !days.some(function (d) { return d.slots.some(function (s) { return s.id === pick.id && s.ok; }); })) pick = null;
-        for (var i = 0; i < days.length; i++) if (days[i].slots.some(function (s) { return s.ok; })) { cur = i; break; }
+        if (multi() && !branch) { var c = $("f-city").value; branch = BRANCHES.indexOf(c) >= 0 ? c : BRANCHES[0]; }
+        firstOpen();
         draw(); sync();
       }).catch(function () { on = false; sync(); });
     }
     $("f-course").addEventListener("change", sync);
+    $("f-city").addEventListener("change", function () {
+      var c = this.value;
+      if (multi() && BRANCHES.indexOf(c) >= 0 && c !== branch) { branch = c; pick = null; $("tnote").textContent = "Longer-range times go to our students first."; firstOpen(); draw(); }
+    });
     load();
     return {
       active: function () { return on && !vocals(); },
