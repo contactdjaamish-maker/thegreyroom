@@ -190,6 +190,27 @@
   .wa-link:hover{background:transparent;color:var(--ink);}
   .note-fine{font-family:var(--mono);font-size:10px;letter-spacing:.08em;
              text-transform:uppercase;opacity:.55;line-height:1.7;margin:0;}
+  /* trial picker - the same slot vocabulary as The Room, a three-day window */
+  .pick { display: flex; flex-direction: column; gap: 10px; }
+  .pick > label { font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .14em;
+                  text-transform: uppercase; opacity: .72; }
+  .dtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .dtabs button { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+                  background: var(--black); color: var(--dim); border: 0; padding: 11px 4px; cursor: pointer; line-height: 1.5; margin: 0; }
+  .dtabs button small { display: block; font-size: 9px; letter-spacing: .14em; opacity: .75; }
+  .dtabs button[aria-selected="true"] { background: var(--grey); color: var(--ink); }
+  .tslots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tslot { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .06em; background: transparent;
+           color: var(--ink); border: 1px solid var(--line); padding: 11px 4px; cursor: pointer; margin: 0; text-transform: none; }
+  .tslot:hover { border-color: var(--ink); background: transparent; color: var(--ink); }
+  .tslot[disabled] { color: rgba(242,241,237,.22); text-decoration: line-through; cursor: default; }
+  .tslot[disabled]:hover { border-color: var(--line); }
+  .tslot.sel, .tslot.sel:hover { background: var(--ink); color: var(--black); border-color: var(--ink); }
+  .tnote { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+           color: var(--dim); margin: 0; line-height: 1.7; }
+  .tnote b { color: var(--ink); font-weight: 500; }
+  .dtabs button:hover { color: var(--ink); background: var(--black); }
+  .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
   @media print{
     .gridbg{display:none;} body{padding:0;} form,button,.wa-link,.status{display:none;}
     .phase,.spec div,.task{background:#2b2b2d !important;}
@@ -227,7 +248,7 @@
   <section id="trial">
     <div class="sec-head"><h2>Book a trial</h2><span class="fill"></span>
       <span class="tag">Takes a minute</span></div>
-    <p class="stand" style="margin:0 0 22px;font-size:.95rem;">Bring whatever you are working on, however rough. Fill this in and we&rsquo;ll message you on WhatsApp to fix a time.</p>
+    <p class="stand" id="trialStand" style="margin:0 0 22px;font-size:.95rem;">Bring whatever you are working on, however rough. Fill this in and we&rsquo;ll message you on WhatsApp to fix a time.</p>
 
     <form id="reg" novalidate>
       <div class="field">
@@ -256,6 +277,14 @@
         <select id="f-level" name="level"><option>Never opened a DAW</option><option>Made a few loops</option><option>Finishing tracks already</option><option>Released something</option></select>
       </div>
 
+      <div class="pick" id="pick" hidden>
+        <label>Pick a time &middot; next three days</label>
+        <div class="dtabs" id="dtabs" role="tablist"></div>
+        <div class="tslots" id="tslots"></div>
+        <p class="tnote" id="tnote">Longer-range times go to our students first.</p>
+      </div>
+      <p class="tnote" id="vnote" hidden></p>
+
       <button type="submit" id="submit">Send on WhatsApp</button>
       <p class="note-fine" id="hint">Opens WhatsApp with your details filled in. Nothing is posted publicly.</p>
       <div class="status" id="status" hidden></div>
@@ -279,6 +308,7 @@
   var WHATSAPP_NUMBER = "919999731560";
   var SHEET_ENDPOINT  = "https://script.google.com/macros/s/AKfycbxrOCpE4qbX4s8pcHi2wt3LYliUhLPc9-1doybm3ppGMvZYNitX39Ofb4dK06j6IxHrrQ/exec";
   var COURSE          = "Music production - 3 months";
+  var ROOM_ENDPOINT   = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec";
   // ---------------------------------------------------------------------
 
   var form   = document.getElementById("reg");
@@ -287,6 +317,87 @@
   var submit = document.getElementById("submit");
 
   function show(msg) { statusBox.hidden = false; statusBox.textContent = msg; }
+
+  // ---- trial picker: reads the same calendar as The Room --------------------
+  // Stays switched off until ROOM_ENDPOINT is set, and switches itself off if
+  // the calendar can't be reached - the form then works exactly as before.
+  var TRIAL = (function () {
+    var on = false, days = [], cur = 0, pick = null;
+    var D = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var L = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var M = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
+    var $ = function (id) { return document.getElementById(id); };
+    function live() { return ROOM_ENDPOINT && ROOM_ENDPOINT.indexOf("__") !== 0; }
+    function hr(h) { return (h % 12 || 12) + " " + (h >= 12 ? "PM" : "AM"); }
+    function vocals() { return /vocal|topl/i.test(COURSE); }
+    function when(s) { var d = new Date(s.date + "T00:00"); return L[d.getDay()] + " " + d.getDate() + " " + M[d.getMonth()] + ", " + hr(s.hour) + (s.at ? ", " + s.at : ""); }
+    function post(o) {
+      return fetch(ROOM_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                                    body: JSON.stringify(o) }).then(function (r) { return r.json(); });
+    }
+    function sync() {
+      var use = on && !vocals();
+      $("pick").hidden = !use;
+      $("vnote").hidden = !(on && vocals());
+      if (!submit.disabled) submit.textContent = use ? "Book the trial" : "Send on WhatsApp";
+      var st = $("trialStand");
+      if (st) {
+        if (!st.getAttribute("data-was")) st.setAttribute("data-was", st.innerHTML);
+        st.innerHTML = use ? st.getAttribute("data-was").replace(/Fill this in[^.]*\./, "Pick a time in the next three days \u2014 it\u2019s yours the moment you book.")
+                           : st.getAttribute("data-was");
+      }
+      hint.textContent = use ? "The time is yours the moment you book. WhatsApp opens so you can say hello."
+                             : "Opens WhatsApp with your details filled in. Nothing is posted publicly.";
+    }
+    function draw() {
+      var tabs = $("dtabs"), box = $("tslots"); tabs.innerHTML = ""; box.innerHTML = "";
+      days.forEach(function (d, i) {
+        var b = document.createElement("button"), dt = new Date(d.date + "T00:00");
+        b.type = "button"; b.setAttribute("role", "tab"); b.setAttribute("aria-selected", i === cur ? "true" : "false");
+        b.innerHTML = (i === 0 ? "Today" : i === 1 ? "Tomorrow" : D[dt.getDay()] + " " + dt.getDate()) +
+                      "<small>" + (d.at || "Closed") + "</small>";
+        b.addEventListener("click", function () { cur = i; draw(); });
+        tabs.appendChild(b);
+      });
+      var day = days[cur];
+      if (!day || !day.slots.length) { box.innerHTML = '<p class="tnote" style="grid-column:1/-1">Closed</p>'; return; }
+      var any = false;
+      day.slots.forEach(function (s) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "tslot"; b.textContent = hr(s.hour);
+        if (!s.ok) b.disabled = true; else any = true;
+        if (pick && pick.id === s.id) b.classList.add("sel");
+        b.addEventListener("click", function () {
+          pick = { id: s.id, date: day.date, hour: s.hour, at: day.at };
+          statusBox.hidden = true;
+          var city = $("f-city");
+          for (var k = 0; k < city.options.length; k++) if (city.options[k].text === day.at) city.selectedIndex = k;
+          $("tnote").innerHTML = "<b>" + when(pick) + "</b>";
+          draw();
+        });
+        box.appendChild(b);
+      });
+      if (!any) box.insertAdjacentHTML("beforeend", '<p class="tnote" style="grid-column:1/-1">Nothing left this day</p>');
+    }
+    function load() {
+      if (!live()) return;
+      post({ type: "trial_slots" }).then(function (r) {
+        if (!r || !r.ok || !r.days) return;
+        days = r.days;
+        on = days.some(function (d) { return d.slots.some(function (s) { return s.ok; }); });
+        if (pick && !days.some(function (d) { return d.slots.some(function (s) { return s.id === pick.id && s.ok; }); })) pick = null;
+        for (var i = 0; i < days.length; i++) if (days[i].slots.some(function (s) { return s.ok; })) { cur = i; break; }
+        draw(); sync();
+      }).catch(function () { on = false; sync(); });
+    }
+    load();
+    return {
+      active: function () { return on && !vocals(); },
+      chosen: function () { return pick; },
+      when: when,
+      reload: function () { pick = null; $("tnote").textContent = "Longer-range times go to our students first."; load(); },
+      book: function (o) { o.type = "trial_book"; return post(o).catch(function () { return null; }); }
+    };
+  })();
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -298,9 +409,24 @@
 
     if (!name || !phone) { show("Add your name and number first."); return; }
 
+    if (TRIAL.active()) {
+      var slot = TRIAL.chosen();
+      if (!slot) { show("Pick a time first."); return; }
+      submit.disabled = true; submit.textContent = "Booking...";
+      TRIAL.book({ name: name, phone: phone, city: city, course: COURSE, level: level, slot: slot.id }).then(function (r) {
+        submit.disabled = false; submit.textContent = "Book the trial";
+        if (r && r.ok) return finish(TRIAL.when(slot), true);
+        if (r && r.error) { show(r.error); TRIAL.reload(); return; }
+        finish("", false);
+      });
+      return;
+    }
+    finish("", false);
+
+    function finish(whenText, booked) {
     var entry = {
       name: name, phone: phone, city: city,
-      course: COURSE, level: level,
+      course: COURSE, level: level + (whenText ? " - trial booked " + whenText : ""),
       submittedAt: new Date().toISOString()
     };
 
@@ -317,14 +443,14 @@
     }
 
     var lines = [
-      "Trial session request - The Grey Room",
+      booked ? "Trial booked - The Grey Room" : "Trial session request - The Grey Room",
       "",
       "Name: " + name,
       "Phone: " + phone,
       "City: " + city,
       "Course: " + COURSE,
       "Level: " + level
-    ].join("\n");
+    ].concat(whenText ? ["When: " + whenText] : []).join("\n");
 
     if (!WHATSAPP_NUMBER || WHATSAPP_NUMBER.indexOf("_") !== -1) {
       show("WhatsApp number is not set on this page yet."); return;
@@ -335,8 +461,10 @@
     wa.hidden = false;
     hint.hidden = true;
     submit.hidden = true;
-    show("Your details are ready. Tap below and WhatsApp opens with the message written out - just hit send.");
+    show(booked ? "Booked - " + whenText + ". It's yours. Tap below to say hello on WhatsApp."
+                : "Your details are ready. Tap below and WhatsApp opens with the message written out - just hit send.");
     wa.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
   });
 </script>
 </body>
