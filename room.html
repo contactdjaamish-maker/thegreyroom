@@ -438,7 +438,7 @@
   </div>
 
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
+    <span class="fine">The Grey Room &middot; Gurugram</span>
     <span class="fine">Cancel up to 24 hours before</span>
   </footer>
 </div>
@@ -696,8 +696,21 @@
     $("sheet").hidden = false;
     $("sheetBtns").hidden = mode !== "ask";
     $("sheetWA").hidden = mode !== "done";
-    $("sheetDone").hidden = mode !== "done" && mode !== "note";
+    // After a booking or a cancel, WhatsApp is the only way out: the message
+    // from their own number is how Aamish hears about it. Done appears once sent.
+    $("sheetDone").hidden = mode !== "note";
   }
+  function tellAamish(head, s) {
+    var st = S.student || {};
+    $("sheetWA").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
+      "The Grey Room \u2014 " + head + "\n\n" + (st.name || "") + (st.course ? " \u00b7 " + st.course : "") + "\n" +
+      label(s) + "\n" + hr(s.hour) + " \u2013 " + hr(s.hour + 1) + " \u00b7 " + s.at);
+    $("sheetWA").textContent = "Send to Aamish on WhatsApp";
+    sheet("done");
+  }
+  $("sheetWA").addEventListener("click", function () {
+    setTimeout(function () { $("sheetDone").hidden = false; $("sheetWA").textContent = "Send again"; }, 600);
+  });
   function closeSheet() {
     $("sheet").hidden = true; S.pick = null;
     document.querySelectorAll(".slot.sel").forEach(function (x) { x.classList.remove("sel"); });
@@ -726,7 +739,9 @@
       call({ type: "portal_cancel", code: S.code, slot: s.id }).then(function (r) {
         btn.disabled = false;
         if (!r.ok) { $("sheetK").textContent = "Couldn't cancel"; $("sheetD").textContent = r.error || "Message Aamish instead."; sheet("note"); return; }
-        closeSheet(); load();
+        $("sheetK").textContent = "Cancelled \u00b7 one last step";
+        $("sheetD").textContent = "Send this so Aamish knows the slot is free.";
+        tellAamish("cancelled", s); load();
       });
       return;
     }
@@ -734,11 +749,9 @@
     call({ type: "portal_book", code: S.code, slot: s.id }).then(function (r) {
       btn.disabled = false;
       if (!r.ok) { $("sheetK").textContent = "Couldn't book"; $("sheetD").textContent = r.error || "Someone took it first. Pick another time."; sheet("note"); load(); return; }
-      $("sheetK").textContent = "Booked";
-      $("sheetD").textContent = hr(s.hour) + " · " + s.at + " · it's in the calendar";
-      $("sheetWA").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
-        "The Grey Room — booked\n\n" + S.student.name + "\n" + label(s) + "\n" + hr(s.hour) + " · " + s.at);
-      sheet("done"); load();
+      $("sheetK").textContent = "Booked \u00b7 one last step";
+      $("sheetD").textContent = hr(s.hour) + " \u00b7 " + s.at + ". Send this so Aamish sees it on WhatsApp.";
+      tellAamish("session booked", s); load();
     });
   });
 
