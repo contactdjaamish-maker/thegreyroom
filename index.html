@@ -3,6 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // Ask for trial times the moment the page starts, not after it has drawn.
+  (function () {
+    var u = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec";
+    if (!u || u.indexOf("__") === 0 || !window.fetch) return;
+    try { window.GR_SLOTS = fetch(u, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                                       body: '{"type":"trial_slots"}' }).then(function (r) { return r.json(); });
+          window.GR_SLOTS.catch(function () {});   // handled later, in the trial picker
+    } catch (e) {}
+  })();
+</script>
 <meta name="theme-color" content="#050505">
 <title>Enter The Grey Room</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -519,7 +530,7 @@
   // Stays switched off until ROOM_ENDPOINT is set, and switches itself off if
   // the calendar can't be reached - the form then works exactly as before.
   var TRIAL = (function () {
-    var on = false, days = [], cur = 0, pick = null, branch = null;
+    var on = false, waiting = false, days = [], cur = 0, pick = null, branch = null;
     var D = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var L = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
     var M = ["Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"];
@@ -534,7 +545,7 @@
     }
     function sync() {
       var use = on && !vocals();
-      $("pick").hidden = !use;
+      $("pick").hidden = !(use || (waiting && !vocals()));
       $("vnote").hidden = !(on && vocals());
       if (!submit.disabled) submit.textContent = use ? "Book the trial" : "Send on WhatsApp";
       var st = $("trialStand");
@@ -593,17 +604,33 @@
       });
       if (!any) box.insertAdjacentHTML("beforeend", '<p class="tnote" style="grid-column:1/-1">Nothing left this day</p>');
     }
-    function load() {
-      if (!live()) return;
-      post({ type: "trial_slots" }).then(function (r) {
-        if (!r || !r.ok || !r.days) return;
+    var KEY = "gr_trial";
+    function take(r) {
+        if (!r || !r.ok || !r.days) return false;
         days = r.days;
         on = days.some(function (d) { return d.slots.some(function (s) { return s.ok; }); });
         if (pick && !days.some(function (d) { return d.slots.some(function (s) { return s.id === pick.id && s.ok; }); })) pick = null;
         if (multi() && !branch) { var c = $("f-city").value; branch = BRANCHES.indexOf(c) >= 0 ? c : BRANCHES[0]; }
         firstOpen();
         draw(); sync();
-      }).catch(function () { on = false; sync(); });
+        return true;
+    }
+    function load(again) {
+      if (!live()) return;
+      // A copy from the last ten minutes shows at once; the fresh answer replaces it.
+      // Booking always re-checks the live calendar, so an old copy can't double-book.
+      if (!again) try {
+        var c = JSON.parse(localStorage.getItem(KEY) || "null");
+        if (c && Date.now() - c.t < 10 * 60 * 1000) take(c.r);
+      } catch (e) {}
+      if (!on) { waiting = true; $("tslots").innerHTML = '<p class="tnote" style="grid-column:1/-1">Finding times…</p>'; sync(); }
+      var ask = (!again && window.GR_SLOTS) || post({ type: "trial_slots" });
+      window.GR_SLOTS = null;
+      ask.then(function (r) {
+        waiting = false;
+        if (take(r)) { try { localStorage.setItem(KEY, JSON.stringify({ t: Date.now(), r: r })); } catch (e) {} }
+        else sync();
+      }).catch(function () { waiting = false; if (!days.length) on = false; sync(); });
     }
     $("f-course").addEventListener("change", sync);
     $("f-city").addEventListener("change", function () {
@@ -615,8 +642,12 @@
       active: function () { return on && !vocals(); },
       chosen: function () { return pick; },
       when: when,
-      reload: function () { pick = null; $("tnote").textContent = "Longer-range times go to our students first."; load(); },
-      book: function (o) { o.type = "trial_book"; return post(o).catch(function () { return null; }); }
+      reload: function () { pick = null; $("tnote").textContent = "Longer-range times go to our students first."; load(true); },
+      book: function (o) {
+        o.type = "trial_book";
+        return post(o).then(function (r) { if (r && r.ok) try { localStorage.removeItem(KEY); } catch (e) {} return r; })
+                      .catch(function () { return null; });
+      }
     };
   })();
 
