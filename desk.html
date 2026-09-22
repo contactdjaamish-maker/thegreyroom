@@ -304,6 +304,13 @@
   .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   .three input{text-align:left;-moz-appearance:textfield;appearance:textfield;}
   .three input::-webkit-inner-spin-button,.three input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .pair input{text-align:left;-moz-appearance:textfield;appearance:textfield;}
+  .pair input::-webkit-inner-spin-button,.pair input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .grp{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:14px;}
+  .grp > .gk{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0;}
+  .sum{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;line-height:1.7;color:var(--dim);margin:0;}
+  .sum b{color:var(--ink);font-weight:500;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .codebox{border:1px solid var(--line);padding:22px 18px;text-align:center;}
   .codebox b{display:block;font-family:var(--mono);font-weight:500;font-size:2rem;letter-spacing:.3em;padding-left:.3em;}
@@ -389,13 +396,34 @@
           <button type="button" data-v="DJ" aria-pressed="true">DJ</button>
           <button type="button" data-v="Production" aria-pressed="false">Production</button>
         </div></div>
-      <div class="three">
-        <div class="field"><label for="s-total">Total</label>
-          <input id="s-total" type="number" inputmode="numeric" min="1" max="200" value="20"></div>
-        <div class="field"><label for="s-week">Per week</label>
-          <input id="s-week" type="number" inputmode="numeric" min="1" max="7" value="2"></div>
-        <div class="field"><label for="s-done">Done</label>
-          <input id="s-done" type="number" inputmode="numeric" min="0" value="0"></div>
+      <div class="field" id="kindWrap"><label>Student</label>
+        <div class="seg" id="s-kind">
+          <button type="button" data-v="new" aria-pressed="true">New</button>
+          <button type="button" data-v="old" aria-pressed="false">Already learning</button>
+        </div></div>
+
+      <div class="grp">
+        <p class="gk">Their plan</p>
+        <div class="three">
+          <div class="field"><label for="s-classes">Classes</label>
+            <input id="s-classes" type="number" inputmode="numeric" min="1" max="200" value="12"></div>
+          <div class="field"><label for="s-practice">Practice</label>
+            <input id="s-practice" type="number" inputmode="numeric" min="0" max="100" value="8"></div>
+          <div class="field"><label for="s-week">Per week</label>
+            <input id="s-week" type="number" inputmode="numeric" min="1" max="7" value="2"></div>
+        </div>
+        <p class="sum" id="planSum"></p>
+      </div>
+
+      <div class="grp" id="leftWrap" hidden>
+        <p class="gk">What they have left</p>
+        <div class="pair">
+          <div class="field"><label for="s-cleft">Classes left</label>
+            <input id="s-cleft" type="number" inputmode="numeric" min="0" value="12"></div>
+          <div class="field"><label for="s-pleft">Practice left</label>
+            <input id="s-pleft" type="number" inputmode="numeric" min="0" value="8"></div>
+        </div>
+        <p class="sum" id="leftSum"></p>
       </div>
       <p class="formmsg" id="sMsg" hidden></p>
       <div class="row2">
@@ -432,9 +460,9 @@
 
   // ---------------------------------------------------------------- demo
   var demo = [
-    { row: 2, name: "Aniket Chhetri", phone: "9967579048", code: "K7MR4X", course: "DJ", total: 12, perWeek: 1, doneBefore: 4, done: 4, upcoming: 1, active: true },
-    { row: 3, name: "Meher Kapoor", phone: "9811111111", code: "M3HQ8Z", course: "Production", total: 24, perWeek: 2, doneBefore: 9, done: 11, upcoming: 2, active: true },
-    { row: 4, name: "Old Student", phone: "9810876610", code: "P2WD7N", course: "DJ", total: 12, perWeek: 1, doneBefore: 12, done: 12, upcoming: 0, active: false }
+    { row: 2, name: "Aniket Chhetri", phone: "9967579048", code: "K7MR4X", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 4, done: 4, upcoming: 1, active: true },
+    { row: 3, name: "Meher Kapoor", phone: "9811111111", code: "M3HQ8Z", course: "Production", total: 24, taught: 24, practice: 0, perWeek: 2, doneBefore: 9, done: 11, upcoming: 2, active: true },
+    { row: 4, name: "Old Student", phone: "9810876610", code: "P2WD7N", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 20, done: 20, upcoming: 0, active: false }
   ];
   function wait(v) { return new Promise(function (r) { setTimeout(function () { r(v); }, 300); }); }
   function demoCode() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", c = ""; for (var i = 0; i < 6; i++) c += a[Math.floor(Math.random() * a.length)]; return c; }
@@ -449,8 +477,8 @@
         if (digits.length !== 10) return wait({ ok: false, error: "Their WhatsApp number needs 10 digits." });
         var x = s.row ? demo.filter(function (d) { return d.row === s.row; })[0] : null;
         if (!x) { x = { row: demo.length + 2, code: demoCode(), upcoming: 0 }; demo.push(x); }
-        x.name = s.name; x.phone = digits; x.course = s.course; x.total = +s.total; x.perWeek = +s.perWeek;
-        x.doneBefore = +s.doneBefore || 0; x.done = x.doneBefore; x.active = s.active !== false;
+        x.name = s.name; x.phone = digits; x.course = s.course; x.taught = +s.classes; x.practice = +s.practice || 0; x.total = x.taught + x.practice; x.perWeek = +s.perWeek;
+        var viaRoom = (x.done || 0) - (x.doneBefore || 0); x.doneBefore = +s.doneBefore || 0; x.done = x.doneBefore + Math.max(0, viaRoom); x.active = s.active !== false;
         return wait({ ok: true, student: JSON.parse(JSON.stringify(x)) });
       }
       if (p.type === "admin_newcode") { var y = demo.filter(function (d) { return d.row === p.row; })[0]; y.code = demoCode(); return wait({ ok: true, code: y.code }); }
@@ -485,8 +513,17 @@
       S.list = r.students; draw();
     });
   }
+  // What's left, in the two parts of their plan.
+  function left(s) {
+    var taught = s.taught == null ? s.total : s.taught, practice = s.practice || 0, done = s.done || 0;
+    return { classes: Math.max(0, taught - done), practice: Math.max(0, practice - Math.max(0, done - taught)) };
+  }
   function line(s) {
-    var prog = s.total ? (s.done >= s.total ? "course complete" : (s.taught && s.done >= s.taught ? "practice \u00b7 " : "") + "session " + Math.min(s.done + 1, s.total) + " of " + s.total) : "";
+    var l = left(s), prog;
+    if (!s.total) prog = "";
+    else if (!l.classes && !l.practice) prog = "course complete";
+    else if (!l.classes) prog = "practice \u00b7 " + l.practice + " left";
+    else prog = l.classes + (l.classes === 1 ? " class" : " classes") + " left" + (l.practice ? " + " + l.practice + " practice" : "");
     return [s.course, prog, s.upcoming ? s.upcoming + " booked" : ""].filter(Boolean).join(" · ");
   }
   function row(s) {
@@ -514,10 +551,40 @@
   }
   // Course defaults for a new student. DJ: 12 taught classes + ~8 practice & revision, 2 a week (~45 days).
   // Production: 24 classes, 2 a week (~90 days). Change the boxes for anyone who differs.
-  var DEFAULTS = { DJ: { total: 20, week: 2 }, Production: { total: 24, week: 2 } };
+  var DEFAULTS = { DJ: { classes: 12, practice: 8, week: 2 }, Production: { classes: 24, practice: 0, week: 2 } };
+  function num(id) { var v = Math.floor(+$(id).value); return isNaN(v) ? 0 : v; }
+  function setKind(v) {
+    S.kind = v;
+    document.querySelectorAll("#s-kind button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-v") === v ? "true" : "false"); });
+    $("leftWrap").hidden = v !== "old";
+    sums();
+  }
+  function fillPlan(d) {
+    $("s-classes").value = d.classes; $("s-practice").value = d.practice; $("s-week").value = d.week;
+    $("s-cleft").value = d.classes; $("s-pleft").value = d.practice; sums();
+  }
+  // The running totals under each group, so the numbers always add up in front of you.
+  function sums() {
+    var c = num("s-classes"), p = num("s-practice"), w = Math.max(1, num("s-week"));
+    var weeks = Math.ceil((c + p) / w);
+    $("planSum").innerHTML = "<b>" + (c + p) + " sessions</b> \u00b7 " + c + " classes" + (p ? " + " + p + " practice" : "") +
+      " \u00b7 about " + weeks + (weeks === 1 ? " week" : " weeks") + " at " + w + " a week";
+    if (S.kind === "old") {
+      var cl = num("s-cleft"), pl = num("s-pleft"), booked = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
+      var ahead = S.cur ? S.cur.upcoming || 0 : 0;
+      $("leftSum").innerHTML = "<b>" + (cl + pl) + " left</b> of " + (c + p) + " \u00b7 " + ((c + p) - (cl + pl)) + " done" +
+        (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
+    }
+  }
+  ["s-classes", "s-practice", "s-week", "s-cleft", "s-pleft"].forEach(function (id) { $(id).addEventListener("input", sums); });
+  // Changing the plan of someone new keeps "left" equal to the whole plan.
+  ["s-classes", "s-practice"].forEach(function (id) { $(id).addEventListener("input", function () {
+    if (!S.cur && S.kind !== "old") { $("s-cleft").value = $("s-classes").value; $("s-pleft").value = $("s-practice").value; }
+  }); });
+  document.querySelectorAll("#s-kind button").forEach(function (b) { b.addEventListener("click", function () { setKind(b.getAttribute("data-v")); $("sMsg").hidden = true; }); });
   document.querySelectorAll("#s-course button").forEach(function (b) { b.addEventListener("click", function () {
     var v = b.getAttribute("data-v"); setCourse(v);
-    if (!S.cur && DEFAULTS[v]) { $("s-total").value = DEFAULTS[v].total; $("s-week").value = DEFAULTS[v].week; }
+    if (!S.cur && DEFAULTS[v]) fillPlan(DEFAULTS[v]);
   }); });
 
   function open(mode) {
@@ -531,13 +598,16 @@
   $("addBtn").addEventListener("click", function () {
     S.cur = null; $("pKick").textContent = "New student"; $("pTitle").textContent = "Add a student";
     $("s-name").value = ""; $("s-phone").value = ""; setCourse("DJ");
-    $("s-total").value = 20; $("s-week").value = 2; $("s-done").value = 0; $("sSave").textContent = "Add";
+    $("kindWrap").hidden = false; fillPlan(DEFAULTS.DJ); setKind("new"); $("sSave").textContent = "Add";
     open("add");
   });
   function edit(s) {
     S.cur = s; $("pKick").textContent = s.code + (s.active ? "" : " · switched off"); $("pTitle").textContent = s.name;
     $("s-name").value = s.name; $("s-phone").value = s.phone; setCourse(s.course === "Production" ? "Production" : "DJ");
-    $("s-total").value = s.total; $("s-week").value = s.perWeek; $("s-done").value = s.doneBefore; $("sSave").textContent = "Save";
+    var taught = s.taught == null ? s.total : s.taught, l = left(s);
+    $("s-classes").value = taught; $("s-practice").value = s.practice || 0; $("s-week").value = s.perWeek;
+    $("s-cleft").value = l.classes; $("s-pleft").value = l.practice;
+    $("kindWrap").hidden = true; setKind("old"); $("sSave").textContent = "Save";
     $("sToggle").textContent = s.active ? "Switch off — course finished" : "Switch back on";
     open("edit");
   }
@@ -546,8 +616,13 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("panel").hidden) close(); });
 
   function payload(activeOverride) {
+    var c = num("s-classes"), p = num("s-practice");
+    var cl = S.kind === "old" ? num("s-cleft") : c, pl = S.kind === "old" ? num("s-pleft") : p;
+    // "Done before" is whatever isn't left and wasn't booked through The Room.
+    var viaRoom = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
     var s = { name: $("s-name").value.trim(), phone: $("s-phone").value.trim(), course: S.course,
-              total: $("s-total").value, perWeek: $("s-week").value, doneBefore: $("s-done").value };
+              classes: c, practice: p, perWeek: $("s-week").value,
+              doneBefore: Math.max(0, (c - cl) + (p - pl) - viaRoom) };
     if (S.cur) { s.row = S.cur.row; s.active = activeOverride === undefined ? S.cur.active : activeOverride; }
     return s;
   }
@@ -558,7 +633,15 @@
 
   $("sform").addEventListener("submit", function (e) {
     e.preventDefault();
-    var isNew = !S.cur, btn = $("sSave"); btn.disabled = true;
+    var isNew = !S.cur, btn = $("sSave");
+    var c = num("s-classes"), p = num("s-practice"), cl = num("s-cleft"), pl = num("s-pleft");
+    if (c < 1) { say("Add how many classes are in their plan."); return; }
+    if (S.kind === "old") {
+      if (cl < 0 || cl > c) { say("Classes left can be 0 to " + c + "."); return; }
+      if (pl < 0 || pl > p) { say("Practice left can be 0 to " + p + "."); return; }
+      if (cl > 0 && pl < p) { say("Practice comes after the classes. If they've started practice, classes left is 0."); return; }
+    }
+    btn.disabled = true;
     admin("admin_save", { student: payload() }).then(function (r) {
       btn.disabled = false;
       if (!r.ok) { say(r.error || "Couldn't save."); return; }
