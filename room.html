@@ -3,6 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  // Ask for trial times the moment the page starts, not after it has drawn.
+  (function () {
+    var u = "__ROOM__";
+    if (!u || u.indexOf("__") === 0 || !window.fetch) return;
+    try { window.GR_SLOTS = fetch(u, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                                       body: '{"type":"trial_slots"}' }).then(function (r) { return r.json(); });
+          window.GR_SLOTS.catch(function () {});   // handled later, in the trial picker
+    } catch (e) {}
+  })();
+</script>
 <meta name="theme-color" content="#050505">
 <title>The Room &mdash; The Grey Room</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -468,14 +479,14 @@
   var DEMO = !ENDPOINT;
 
   var $ = function (id) { return document.getElementById(id); };
-  var S = { code: null, student: null, week: 0, slots: [], mine: [], pick: null, weeks: [null, null], fresh: false };
+  var S = { code: null, student: null, week: 0, slots: [], mine: [], pick: null, weeks: [null, null], fresh: false, len: 2 };
 
   // Speed. Google's script takes ~3 s a call, more when it has been asleep.
   // So: everything is asked for at once, the last good copy is shown
   // instantly on return visits, and nothing is fetched twice.
   var CACHE = "gr_room";
   function saveCache() {
-    try { localStorage.setItem(CACHE, JSON.stringify({ code: S.code, student: S.student, profile: S.profile, weeks: S.weeks, t: Date.now() })); } catch (err) {}
+    try { localStorage.setItem(CACHE, JSON.stringify({ code: S.code, student: S.student, profile: S.profile, weeks: S.weeks, len: S.len, t: Date.now() })); } catch (err) {}
   }
   function readCache(code) {
     try {
@@ -498,7 +509,7 @@
     });
     return Promise.all([call({ type: "portal_login", code: code }), weeksFor(code)]).then(function (x) {
       var r = x[0], rs = x[1];
-      if (r.ok && rs[0].ok && rs[1].ok) r.weeks = [rs[0].slots, rs[1].slots];
+      if (r.ok && rs[0].ok && rs[1].ok) { r.weeks = [rs[0].slots, rs[1].slots]; r.hours = rs[0].hours; }
       return r;
     });
   }
@@ -588,7 +599,7 @@
     var cached = readCache(code);
     if (cached) {
       // Straight in with the last copy; the fresh one replaces it in a moment.
-      S.code = code; S.student = cached.student; S.profile = cached.profile; S.weeks = cached.weeks || [null, null]; S.fresh = false;
+      S.code = code; S.student = cached.student; S.profile = cached.profile; S.weeks = cached.weeks || [null, null]; S.fresh = false; S.len = cached.len || S.len;
       openWeek();
     } else {
       $("enter").disabled = true; $("doorMsg").textContent = "Checking…";
@@ -603,6 +614,7 @@
       S.code = code; S.student = r.student; S.profile = r.profile || null;
       try { localStorage.setItem("gr_code", code); } catch (err) {}
       if (r.weeks) { S.weeks = r.weeks; S.fresh = true; }
+      if (r.hours) S.len = r.hours;
       if (cached) { drawHead(); drawProfile(S.profile); show(); } else openWeek();
       if (r.weeks) saveCache();
     }).catch(function () {
@@ -618,9 +630,10 @@
   function drawHead() {
     var st = S.student;
     $("hello").textContent = "Hello, " + st.name + ".";
-    $("who").textContent = st.course + (st.total && st.done >= st.total
-      ? " \u00b7 course complete" : " \u00b7 session " + (st.done + 1) + " of " + st.total);
-    $("allow").textContent = st.perWeek + " a week";
+    var pr = S.profile || {};
+    $("who").textContent = st.course + (st.total && st.done >= st.total ? " \u00b7 course complete"
+      : (pr.phase === "practice" ? " \u00b7 practice & revision" : "") + " \u00b7 session " + (st.done + 1) + " of " + st.total);
+    $("allow").textContent = st.perWeek + " a week \u00b7 " + S.len + " hours each";
   }
 
   $("signout").addEventListener("click", function () {
@@ -642,7 +655,7 @@
     var syl = pr.syllabus || [];
     $("secSyl").hidden = !syl.length;
     if (syl.length) {
-      $("sylTag").textContent = pr.week > pr.weeks ? "Complete" : "Week " + pr.week + " of " + pr.weeks;
+      $("sylTag").textContent = pr.week > pr.weeks ? (pr.phase === "practice" ? "Taught \u00b7 now practice" : "Complete") : "Week " + pr.week + " of " + pr.weeks;
       $("syl").innerHTML = syl.map(function (w) {
         return '<div class="' + w.state + '"><span class="n">' + esc(w.label) + "</span><div><b>" + esc(w.title) +
                "</b>" + (w.points ? "<p>" + esc(w.points) + "</p>" : "") + "</div></div>";
@@ -688,6 +701,7 @@
     openAll(S.code).then(function (r) {
       if (!r || !r.ok || !r.weeks) return;
       S.student = r.student; S.profile = r.profile || S.profile; S.weeks = r.weeks; S.fresh = true;
+      if (r.hours) S.len = r.hours;
       drawHead(); drawProfile(S.profile); show(); saveCache();
     }).catch(function () {});
   }
@@ -697,6 +711,7 @@
     show();
   }
 
+  function span(s) { return hr(s.hour) + " \u2013 " + hr(s.hour + S.len); }
   function label(s) { var d = new Date(s.date + "T00:00"); return LONG[d.getDay()] + " " + nice(d); }
 
   function drawMine() {
@@ -705,10 +720,10 @@
     S.mine.forEach(function (s) {
       var el = document.createElement("div"); el.className = "mine";
       var late = s.start - Date.now() < 24 * 3600 * 1000;
-      el.innerHTML = "<div><b>" + label(s) + "</b><span>" + hr(s.hour) + " · " + s.at + "</span></div>";
+      el.innerHTML = "<div><b>" + label(s) + "</b><span>" + span(s) + " · " + s.at + "</span></div>";
       if (late) {
         var a = document.createElement("a");
-        a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent("Hi Aamish — about my session on " + label(s) + " at " + hr(s.hour) + ".");
+        a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent("Hi Aamish — about my session on " + label(s) + ", " + span(s) + ".");
         a.target = "_blank"; a.rel = "noopener"; a.textContent = "Message";
         a.title = "Inside 24 hours - message Aamish"; el.appendChild(a);
       } else {
@@ -769,7 +784,7 @@
     var st = S.student || {};
     $("sheetWA").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
       "The Grey Room \u2014 " + head + "\n\n" + (st.name || "") + (st.course ? " \u00b7 " + st.course : "") + "\n" +
-      label(s) + "\n" + hr(s.hour) + " \u2013 " + hr(s.hour + 1) + " \u00b7 " + s.at);
+      label(s) + "\n" + span(s) + " \u00b7 " + s.at);
     $("sheetWA").textContent = "Send to Aamish on WhatsApp";
     sheet("done");
   }
@@ -790,7 +805,7 @@
     $("sheetNo").textContent = "Not this one"; $("sheetYes").textContent = "Book it";
     $("sheetK").textContent = "Book this session";
     $("sheetTitle").textContent = label(s);
-    $("sheetD").textContent = hr(s.hour) + " – " + hr(s.hour + 1) + " · " + s.at;
+    $("sheetD").textContent = span(s) + " · " + s.at + " · " + S.len + " hours";
     sheet("ask");
   }
   $("sheetNo").addEventListener("click", closeSheet);
@@ -815,7 +830,7 @@
       btn.disabled = false;
       if (!r.ok) { $("sheetK").textContent = "Couldn't book"; $("sheetD").textContent = r.error || "Someone took it first. Pick another time."; sheet("note"); load(); return; }
       $("sheetK").textContent = "Booked \u00b7 one last step";
-      $("sheetD").textContent = hr(s.hour) + " \u00b7 " + s.at + ". Send this so Aamish sees it on WhatsApp.";
+      $("sheetD").textContent = span(s) + " \u00b7 " + s.at + ". Send this so Aamish sees it on WhatsApp.";
       mark(s.id, "mine"); tellAamish("session booked", s); load();
     });
   });
@@ -824,7 +839,7 @@
     S.pick = s; S.mode = "cancel";
     $("sheetK").textContent = "Cancel this session?";
     $("sheetTitle").textContent = label(s);
-    $("sheetD").textContent = hr(s.hour) + " · " + s.at + " — the slot opens for someone else";
+    $("sheetD").textContent = span(s) + " · " + s.at + " — the time opens for someone else";
     $("sheetNo").textContent = "Keep it"; $("sheetYes").textContent = "Cancel it";
     sheet("ask");
   }
