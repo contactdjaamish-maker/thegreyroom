@@ -15,7 +15,7 @@
   })();
 </script>
 <meta name="theme-color" content="#050505">
-<title>The Desk &mdash; The Grey Room</title>
+<title>Mentors &mdash; The Grey Room</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root{
@@ -235,117 +235,212 @@
 <meta name="robots" content="noindex, nofollow">
 <style>
   [hidden]{display:none !important;}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+           clip:rect(0 0 0 0);white-space:nowrap;border:0;}
 
   /* ---------- the door ---------- */
-  .gate{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;align-items:center;
-        justify-content:center;text-align:center;padding:40px 20px;gap:18px;}
-  .gate h1{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:clamp(1.25rem,4vw,1.5rem);line-height:1;margin:0;letter-spacing:.02em;}
+  .door{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;text-align:center;padding:40px 20px;gap:18px;}
+  .door h1{font-family:var(--disp);font-weight:400;text-transform:uppercase;
+           font-size:clamp(1.25rem,4vw,1.5rem);line-height:1;margin:0;letter-spacing:.02em;}
   .rule-s{width:40px;height:1px;background:rgba(242,241,237,.34);}
-  .gate p.hint{font-family:var(--sans);font-weight:300;font-size:1.05rem;margin:0;opacity:.85;}
-  .gate form{display:flex;flex-direction:column;align-items:center;gap:16px;width:min(320px,100%);margin-top:6px;}
-  .key{background:transparent;border:0;border-bottom:1px solid rgba(242,241,237,.28);color:var(--ink);
-       font-family:var(--mono);font-weight:500;font-size:1.05rem;letter-spacing:.22em;text-align:center;
-       text-transform:uppercase;width:100%;padding:10px 0 10px .22em;}
-  .key:focus{outline:0;border-bottom-color:var(--ink);}
-  .key::placeholder{color:var(--ink);opacity:.22;}
-  .btn{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;
-       background:var(--ink);color:var(--black);border:1px solid var(--ink);padding:13px 22px;cursor:pointer;
-       width:100%;margin:0;text-align:center;text-decoration:none;display:block;}
+  .door p.hint{font-family:var(--sans);font-weight:300;font-size:1.05rem;margin:0;opacity:.85;}
+  .door form{display:flex;flex-direction:column;align-items:center;gap:16px;width:min(300px,100%);margin-top:6px;}
+  .code{background:transparent;border:0;border-bottom:1px solid rgba(242,241,237,.28);
+        color:var(--ink);font-family:var(--mono);font-weight:500;font-size:1.35rem;
+        letter-spacing:.42em;text-align:center;text-transform:uppercase;width:100%;
+        padding:10px 0 10px .42em;}
+  .code:focus{outline:0;border-bottom-color:var(--ink);}
+  .code::placeholder{color:var(--ink);opacity:.22;}
+  .btn{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.18em;
+       text-transform:uppercase;background:var(--ink);color:var(--black);border:1px solid var(--ink);
+       padding:13px 22px;cursor:pointer;width:100%;}
   .btn:hover{background:transparent;color:var(--ink);}
   .btn:disabled{opacity:.4;cursor:default;}
   .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);}
   .btn.ghost:hover{border-color:var(--ink);}
-  .msg{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);min-height:1.2em;margin:0;}
-  .corner{position:fixed;left:20px;bottom:20px;z-index:3;font-family:var(--mono);font-size:10px;font-weight:500;
-          letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;}
+  .msg{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+       color:var(--dim);min-height:1.2em;margin:0;}
+  .corner{position:fixed;left:20px;bottom:20px;z-index:3;font-family:var(--mono);font-size:10px;
+          font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none;}
   .corner:hover{color:var(--ink);}
-  .demo-tag{position:fixed;right:20px;bottom:20px;z-index:3;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
-            text-transform:uppercase;color:rgba(242,241,237,.38);}
+  .demo-tag{position:fixed;right:20px;bottom:20px;z-index:3;font-family:var(--mono);font-size:10px;
+            letter-spacing:.14em;text-transform:uppercase;color:rgba(242,241,237,.38);}
 
-  /* ---------- the desk ---------- */
-  .hello{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:clamp(2rem,7vw,2.8rem);line-height:.95;margin:0;}
-  .who{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0;}
-  .signout{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
-           background:none;border:0;padding:0;cursor:pointer;text-align:left;margin:0;}
-  .signout:hover{color:var(--ink);background:none;}
+  /* ---------- the week ---------- */
+  .hello{font-family:var(--disp);font-weight:400;text-transform:uppercase;
+         font-size:clamp(2rem,7vw,2.8rem);line-height:.95;margin:0;}
+  .who{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;
+       text-transform:uppercase;color:var(--dim);margin:0;}
   @media (max-width:999px){
-    #desk .cover{gap:14px;padding-block:0 18px;}
-    #desk .mark{width:92px;}
-    #desk .home-hint{display:none;}
+    #week .cover{gap:14px;padding-block:0 18px;}
+    #week .mark{width:92px;}
+    #week .home-hint{display:none;}
     .hello{font-size:clamp(1.7rem,6.5vw,2.2rem);}
   }
+  .signout{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+           color:var(--dim);background:none;border:0;padding:0;cursor:pointer;text-align:left;}
+  .signout:hover{color:var(--ink);}
 
-  .people{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:8px;}
-  .person{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:var(--black);
-          padding:15px 16px;cursor:pointer;border:0;color:var(--ink);text-align:left;width:100%;margin:0;
-          font:inherit;text-transform:none;letter-spacing:0;transition:background .14s linear;}
-  .person:hover,.person:focus-visible{background:var(--grey);color:var(--ink);}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+        border:1px solid var(--line);margin-bottom:26px;}
+  .tabs button{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.16em;
+               text-transform:uppercase;background:var(--black);color:var(--dim);border:0;
+               padding:13px 10px;cursor:pointer;}
+  .tabs button[aria-selected="true"]{background:var(--grey);color:var(--ink);}
+
+  /* yours = solid slab. The same rule as the landing page: solid means live. */
+  .mine{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+        background:var(--grey);padding:16px 18px;margin-bottom:10px;}
+  .mine b{display:block;font-family:var(--disp);font-weight:400;text-transform:uppercase;
+          font-size:1.15rem;line-height:1.05;}
+  .mine span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+             text-transform:uppercase;opacity:.72;margin-top:5px;}
+  .mine button,.mine a{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+             text-transform:uppercase;color:var(--ink);background:transparent;
+             border:1px solid rgba(242,241,237,.35);padding:8px 10px;cursor:pointer;
+             text-decoration:none;white-space:nowrap;}
+  .mine button:hover,.mine a:hover{border-color:var(--ink);}
+  .none{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--dim);border:1px dashed rgba(242,241,237,.22);padding:16px 18px;margin:0 0 10px;}
+
+  .day{padding-block:18px;border-top:1px solid var(--line);}
+  .day:first-of-type{border-top:0;padding-top:4px;}
+  .dayhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .dayhead b{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1.15rem;}
+  .dayhead span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  @media (min-width:1000px){.slots{grid-template-columns:repeat(5,1fr);}}
+  .slot{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;
+        background:transparent;color:var(--ink);border:1px solid var(--line);padding:11px 4px;
+        cursor:pointer;text-align:center;transition:border-color .12s linear,background .12s linear;}
+  .slot:hover{border-color:var(--ink);}
+  .slot.taken,.slot.past{color:rgba(242,241,237,.22);cursor:default;text-decoration:line-through;}
+  .slot.taken:hover,.slot.past:hover{border-color:var(--line);}
+  .slot.is-mine{background:var(--grey);border-color:var(--grey);cursor:default;}
+  .slot.sel{background:var(--ink);color:var(--black);border-color:var(--ink);}
+  .closed{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(242,241,237,.3);margin:0;}
+
+  /* ---------- inside the room ---------- */
+  .practice{background:var(--grey);padding:16px 18px;border-left:2px solid var(--ink);}
+  .practice b{display:block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+              text-transform:uppercase;color:rgba(242,241,237,.66);margin-bottom:7px;}
+  .practice span{font-size:1rem;line-height:1.5;}
+
+  /* the syllabus: done is quiet, now is the solid slab, next is plain */
+  .syl{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .syl > div{display:grid;grid-template-columns:52px 1fr;gap:12px;background:var(--black);padding:13px 15px;}
+  .syl .n{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--dim);padding-top:3px;}
+  .syl b{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1rem;line-height:1.1;}
+  .syl p{margin:5px 0 0;font-size:.9rem;line-height:1.5;opacity:.75;}
+  .syl .done b,.syl .done .n{opacity:.38;}
+  .syl .done p{display:none;}
+  .syl .now{background:var(--grey);}
+  .syl .now .n{color:var(--ink);}
+  .syl .next p{display:none;}
+
+  .notes{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .notes > div{background:var(--black);padding:14px 16px;}
+  .notes b{display:block;font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.12em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+  .notes span{font-size:.97rem;line-height:1.55;}
+
+  .links{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .links a{display:flex;justify-content:space-between;align-items:baseline;gap:14px;background:var(--black);
+           padding:14px 16px;color:var(--ink);text-decoration:none;transition:background .14s linear;}
+  .links a:hover,.links a:focus-visible{background:var(--grey);}
+  .links a span{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1rem;line-height:1.1;}
+  .links a i{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+             text-transform:uppercase;color:var(--dim);white-space:nowrap;}
+  .links .kind{display:block;background:var(--black);padding:10px 16px 8px;font-family:var(--mono);font-size:9.5px;
+               letter-spacing:.14em;text-transform:uppercase;color:var(--dim);}
+
+  /* confirm - a sheet from the bottom on phones, a panel on desktop */
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--black);
+         border-top:1px solid rgba(242,241,237,.28);padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+         display:flex;flex-direction:column;gap:12px;}
+  .sheet .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0;}
+  .sheet h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1.5rem;line-height:1;margin:0;}
+  .sheet .d{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0;}
+  .sheet .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+  @media (min-width:1000px){.sheet{left:auto;right:32px;bottom:32px;width:360px;border:1px solid rgba(242,241,237,.28);}}
+</style>
+
+<style>
+  .search{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);
+          font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:10px 0;margin-bottom:14px;}
+  .search:focus{outline:0;border-bottom-color:var(--ink);}
+  .search::placeholder{color:var(--dim);}
+  .people{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .person{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--black);
+          padding:14px 16px;border:0;color:var(--ink);text-align:left;cursor:pointer;width:100%;margin:0;}
+  .person:hover,.person:focus-visible{background:var(--grey);}
   .person b{display:block;font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1.1rem;line-height:1.05;}
-  .person span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-               color:var(--dim);margin-top:6px;}
-  .person i{font-style:normal;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.18em;color:var(--ink);}
-  .person.off b,.person.off i{opacity:.4;}
-  .empty{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
-         border:1px dashed rgba(242,241,237,.22);padding:16px 18px;margin:0 0 8px;}
-
-  /* ---------- the form: full screen on phones, a panel on desktop ---------- */
-  .panel{position:fixed;inset:0;z-index:20;background:var(--black);overflow-y:auto;
-         padding:28px 20px calc(28px + env(safe-area-inset-bottom));}
-  .panel-in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:18px;}
-  @media (min-width:1000px){.panel{left:auto;width:480px;border-left:1px solid rgba(242,241,237,.28);}}
-  .panel .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0;}
-  .panel h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1.7rem;line-height:1;margin:0;}
-  .seg{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
-  .seg button{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
-              background:var(--black);color:var(--dim);border:0;padding:12px 8px;cursor:pointer;margin:0;}
-  .seg button:hover{color:var(--ink);background:var(--black);}
-  .seg button[aria-pressed="true"],.seg button[aria-pressed="true"]:hover{background:var(--grey);color:var(--ink);}
-  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-  .three input{text-align:left;-moz-appearance:textfield;appearance:textfield;}
-  .three input::-webkit-inner-spin-button,.three input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  .pair input{text-align:left;-moz-appearance:textfield;appearance:textfield;}
-  .pair input::-webkit-inner-spin-button,.pair input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-  .grp{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:14px;}
-  .grp > .gk{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0;}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;}
-  .chips button{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
-                background:transparent;color:var(--dim);border:1px solid var(--line);padding:9px 12px;cursor:pointer;margin:0;}
-  .chips button[aria-pressed="true"]{background:var(--grey);border-color:var(--grey);color:var(--ink);}
-  .seg4{grid-template-columns:1fr 1fr;}
-  .seg3{grid-template-columns:1fr 1fr 1fr;}
-  .sum{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;line-height:1.7;color:var(--dim);margin:0;}
-  .sum b{color:var(--ink);font-weight:500;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .codebox{border:1px solid var(--line);padding:22px 18px;text-align:center;}
-  .codebox b{display:block;font-family:var(--mono);font-weight:500;font-size:2rem;letter-spacing:.3em;padding-left:.3em;}
-  .codebox span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:8px;}
-  .quiet{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-         background:none;border:0;padding:6px 0;cursor:pointer;text-align:left;margin:0;}
-  .quiet:hover{color:var(--ink);background:none;}
-  .formmsg{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;line-height:1.6;
-           padding:12px 14px;background:var(--grey);border-left:2px solid var(--ink);margin:0;}
+  .person span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:5px;line-height:1.6;}
+  .person i{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
+  .back{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+        background:none;border:0;padding:0;cursor:pointer;margin:0 0 18px;}
+  .back:hover{color:var(--ink);}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .stats div{background:var(--black);padding:14px 12px;}
+  .stats div.on{background:var(--grey);}
+  .stats b{display:block;font-family:var(--disp);font-weight:400;font-size:1.9rem;line-height:1;}
+  .stats span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:6px;}
+  .sline{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:12px 0 0;line-height:1.7;}
+  .sline a{color:var(--ink);}
+  .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--black);padding:13px 16px;}
+  .rows{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .row b{display:block;font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1rem;line-height:1.1;}
+  .row span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:4px;}
+  .mark2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .mark2 button{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+                background:var(--black);color:var(--dim);border:0;padding:8px 10px;cursor:pointer;margin:0;}
+  .mark2 button[aria-pressed="true"]{background:var(--grey);color:var(--ink);}
+  .mark2 button:hover{color:var(--ink);}
+  .field2{width:100%;background:transparent;border:1px solid var(--line);color:var(--ink);
+          font-family:var(--sans);font-weight:300;font-size:1rem;line-height:1.5;padding:12px 14px;resize:vertical;
+          text-transform:none;letter-spacing:normal;}
+  .field2:focus{outline:0;border-color:var(--ink);}
+  textarea.field2{min-height:120px;}
+  .tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .tools .btn{padding:11px 10px;}
+  .btn.rec{background:var(--grey);border-color:var(--grey);color:var(--ink);}
+  .seg2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .seg2 button{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+               background:var(--black);color:var(--dim);border:0;padding:11px 8px;cursor:pointer;margin:0;}
+  .seg2 button[aria-pressed="true"]{background:var(--grey);color:var(--ink);}
+  .note-box{display:flex;flex-direction:column;gap:10px;}
+  .notes .tag2{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+               border:1px solid var(--line);padding:2px 6px;margin-left:6px;color:var(--dim);}
+  .notes .tag2.pub{border-color:rgba(242,241,237,.5);color:var(--ink);}
+  .days{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);}
+  .dayrow{display:grid;grid-template-columns:86px 1fr auto 1fr;gap:10px;align-items:center;background:var(--black);padding:10px 12px;}
+  .dayrow .dbtn{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+                background:transparent;color:var(--dim);border:1px solid var(--line);padding:9px 6px;cursor:pointer;margin:0;}
+  .dayrow .dbtn[aria-pressed="true"]{background:var(--grey);border-color:var(--grey);color:var(--ink);}
+  .dayrow select{background:var(--black);color:var(--ink);border:1px solid var(--line);font-family:var(--mono);font-size:11px;
+                 letter-spacing:.06em;padding:8px 6px;width:100%;}
+  .dayrow select:disabled{opacity:.3;}
+  .dayrow i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--dim);}
+  .toast{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);min-height:1.2em;margin:0;}
 </style>
 
 <div class="gridbg" aria-hidden="true"></div>
 
-<!-- =================== DOOR =================== -->
-<main class="gate" id="gate">
-  <h1>The Desk</h1>
+<main class="door" id="door">
+  <h1>Mentors</h1>
   <div class="rule-s" aria-hidden="true"></div>
-  <p class="hint">Aamish only.</p>
-  <form id="gateForm" novalidate>
-    <label for="key" class="sr-only">Passcode</label>
-    <input class="key" id="key" autocomplete="current-password" autocapitalize="characters" spellcheck="false"
-           maxlength="20" placeholder="&middot;&middot;&middot;&middot;-&middot;&middot;&middot;&middot;-&middot;&middot;&middot;&middot;">
-    <button class="btn" id="gateBtn" type="submit">Enter</button>
-    <p class="msg" id="gateMsg" aria-live="polite"></p>
+  <p class="hint">Mentors only.</p>
+  <form id="doorForm" novalidate>
+    <label for="code" class="sr-only">Your code</label>
+    <input class="code" id="code" name="code" autocomplete="off" autocapitalize="characters"
+           spellcheck="false" maxlength="8" placeholder="&middot;&middot;&middot;&middot;&middot;&middot;">
+    <button class="btn" id="enter" type="submit">Enter</button>
+    <p class="msg" id="doorMsg" aria-live="polite"></p>
   </form>
 </main>
 
-<!-- =================== DESK =================== -->
-<div class="wrap" id="desk" hidden>
+<div class="wrap" id="main" hidden>
   <div class="col-left">
   <div class="cover">
     <a class="home" href="index.html" aria-label="The Grey Room - main page">
@@ -353,561 +448,340 @@
       <span class="home-hint">&larr; Back to The Grey Room</span>
     </a>
     <div>
-      <p class="kicker">The Desk</p>
-      <h1 class="hello">Students.</h1>
+      <p class="kicker">Mentors</p>
+      <h1 class="hello" id="hello">Hello.</h1>
     </div>
-    <p class="who" id="count"></p>
+    <p class="who" id="who"></p>
     <button class="signout" id="signout" type="button">Sign out &rarr;</button>
   </div>
   </div>
 
   <div class="col-right">
     <hr class="gap">
-    <section>
-      <button class="btn" id="addBtn" type="button">Add a student</button>
+    <!-- the list -->
+    <section id="listView">
+      <div class="sec-head"><h2>Your students</h2><span class="fill"></span><span class="tag" id="count"></span></div>
+      <input class="search" id="search" type="search" placeholder="Search a name" autocomplete="off">
+      <div class="people" id="people"></div>
     </section>
-    <hr>
-    <section>
-      <div class="sec-head"><h2>Active</h2><span class="fill"></span><span class="tag">Tap to edit</span></div>
-      <div id="activeList"></div>
+
+    <section id="hoursView">
+      <hr>
+      <div class="sec-head"><h2>Your days</h2><span class="fill"></span><span class="tag">When you can take classes</span></div>
+      <div class="days" id="days"></div>
+      <div class="note-box" style="margin-top:12px">
+        <button class="btn" id="saveHours" type="button">Save my days</button>
+        <p class="toast" id="hoursMsg" aria-live="polite">Students you teach can only book inside these hours.</p>
+      </div>
     </section>
-    <div id="offWrap" hidden>
-    <hr>
-    <section>
-      <div class="sec-head"><h2>Finished</h2><span class="fill"></span><span class="tag">Switched off</span></div>
-      <div id="offList"></div>
-    </section>
+
+    <!-- one student -->
+    <div id="oneView" hidden>
+      <button class="back" id="back" type="button">&larr; All students</button>
+      <section>
+        <div class="sec-head"><h2 id="sName"></h2><span class="fill"></span><span class="tag" id="sCourse"></span></div>
+        <div class="stats">
+          <div class="on"><b id="stC">0</b><span>Classes left</span></div>
+          <div><b id="stP">0</b><span>Practice left</span></div>
+          <div><b id="stD">0</b><span id="stDl">Done</span></div>
+        </div>
+        <p class="sline" id="sLine"></p>
+      </section>
+      <hr>
+      <section>
+        <div class="sec-head"><h2>Coming up</h2><span class="fill"></span><span class="tag" id="upTag"></span></div>
+        <div class="rows" id="upList"></div>
+      </section>
+      <hr>
+      <section>
+        <div class="sec-head"><h2>Notes</h2><span class="fill"></span><span class="tag">Fast</span></div>
+        <div class="note-box">
+          <textarea class="field2" id="noteText" placeholder="What happened, what's next&hellip;"></textarea>
+          <div class="tools">
+            <button class="btn ghost" id="dictate" type="button">Speak it</button>
+            <button class="btn ghost" id="paste" type="button">Paste from Granola</button>
+          </div>
+          <div class="seg2" id="kind">
+            <button type="button" data-v="Class" aria-pressed="true">Class</button>
+            <button type="button" data-v="Wellbeing" aria-pressed="false">Wellbeing</button>
+          </div>
+          <div class="seg2" id="share">
+            <button type="button" data-v="no" aria-pressed="true">Private</button>
+            <button type="button" data-v="yes" aria-pressed="false">Share with student</button>
+          </div>
+          <button class="btn" id="saveNote" type="button">Save note</button>
+          <p class="toast" id="noteMsg" aria-live="polite"></p>
+        </div>
+        <div class="notes" id="noteList" style="margin-top:16px"></div>
+      </section>
+      <hr>
+      <section>
+        <div class="sec-head"><h2>Practice task</h2><span class="fill"></span><span class="tag">They see it in The Room</span></div>
+        <div class="note-box">
+          <input class="field2" id="task" type="text" placeholder="Blank = the syllabus task for their week">
+          <button class="btn ghost" id="saveTask" type="button">Save task</button>
+          <p class="toast" id="taskMsg" aria-live="polite"></p>
+        </div>
+      </section>
+      <hr>
+      <section>
+        <div class="sec-head"><h2>Past classes</h2><span class="fill"></span><span class="tag">Mark each one</span></div>
+        <div class="rows" id="pastList"></div>
+      </section>
     </div>
-    <hr>
-    <section>
-      <div class="sec-head"><h2>Mentors</h2><span class="fill"></span><span class="tag">First record in the logo</span></div>
-      <div id="mentorList"></div>
-      <button class="btn ghost" id="addMentor" type="button" style="margin-top:12px">Add a mentor</button>
-    </section>
   </div>
 
   <footer>
-    <span class="fine">The Grey Room &middot; The Desk</span>
-    <span class="fine">Everything saves to your sheet</span>
+    <span class="fine">The Grey Room &middot; Mentors</span>
+    <span class="fine">Private notes stay in the sheet</span>
   </footer>
 </div>
 
-<!-- =================== MENTOR =================== -->
-<div class="panel" id="mpanel" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
-  <div class="panel-in">
-    <p class="k" id="mKick">New mentor</p>
-    <h3 id="mTitle">Add a mentor</h3>
-    <form id="mform" novalidate style="display:flex;flex-direction:column;gap:16px;">
-      <div class="field"><label for="m-name">Full name</label>
-        <input id="m-name" type="text" autocomplete="off" placeholder="Their name"></div>
-      <div class="field"><label for="m-phone">WhatsApp number</label>
-        <input id="m-phone" type="tel" inputmode="tel" autocomplete="off" placeholder="+91"></div>
-      <div class="field"><label>They see</label>
-        <div class="chips" id="m-sees">
-          <button type="button" data-v="All DJ" aria-pressed="false">All DJ</button>
-          <button type="button" data-v="All Production" aria-pressed="false">All Production</button>
-          <button type="button" data-v="All Vocals" aria-pressed="false">All Vocals</button>
-          <button type="button" data-v="Everyone" aria-pressed="false">Everyone</button>
-        </div>
-        <p class="sum">Plus every student you tick them on. Tick none of these for "only their students".</p></div>
-      <p class="sum" id="mDays"></p>
-      <p class="formmsg" id="mMsg" hidden></p>
-      <div class="row2">
-        <button class="btn ghost" id="mCancel" type="button">Cancel</button>
-        <button class="btn" id="mSave" type="submit">Save</button>
-      </div>
-    </form>
-    <div id="mExtra" hidden style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px;">
-      <button class="quiet" id="mWelcome" type="button">Send their welcome again &rarr;</button>
-      <button class="quiet" id="mNewCode" type="button">Give them a new code &rarr;</button>
-      <button class="quiet warn" id="mToggle" type="button">Switch off</button>
-    </div>
-    <div id="mDone" hidden style="display:flex;flex-direction:column;gap:14px;">
-      <div class="codebox"><b id="mCode"></b><span id="mNote">Their mentor code</span></div>
-      <a class="btn" id="mWA" target="_blank" rel="noopener">Send welcome on WhatsApp</a>
-      <button class="btn ghost" id="mClose" type="button">Done</button>
-    </div>
-  </div>
-</div>
-
-<!-- =================== FORM =================== -->
-<div class="panel" id="panel" hidden role="dialog" aria-modal="true" aria-labelledby="pTitle">
-  <div class="panel-in">
-    <p class="k" id="pKick">New student</p>
-    <h3 id="pTitle">Add a student</h3>
-
-    <form id="sform" novalidate style="display:flex;flex-direction:column;gap:16px;">
-      <div class="field"><label for="s-name">Full name</label>
-        <input id="s-name" type="text" autocomplete="off" placeholder="Their name"></div>
-      <div class="field"><label for="s-phone">WhatsApp number</label>
-        <input id="s-phone" type="tel" inputmode="tel" autocomplete="off" placeholder="+91"></div>
-      <div class="field"><label>Course</label>
-        <div class="seg seg3" id="s-course">
-          <button type="button" data-v="DJ" aria-pressed="true">DJ</button>
-          <button type="button" data-v="Production" aria-pressed="false">Production</button>
-          <button type="button" data-v="Vocals" aria-pressed="false">Vocals &middot; online</button>
-        </div></div>
-      <div class="field" id="kindWrap"><label>Student</label>
-        <div class="seg" id="s-kind">
-          <button type="button" data-v="new" aria-pressed="true">New</button>
-          <button type="button" data-v="old" aria-pressed="false">Already learning</button>
-        </div></div>
-
-      <div class="grp">
-        <p class="gk">Their plan</p>
-        <div class="three">
-          <div class="field"><label for="s-classes">Classes</label>
-            <input id="s-classes" type="number" inputmode="numeric" min="1" max="200" value="12"></div>
-          <div class="field"><label for="s-practice">Practice</label>
-            <input id="s-practice" type="number" inputmode="numeric" min="0" max="100" value="8"></div>
-          <div class="field"><label for="s-week">Per week</label>
-            <input id="s-week" type="number" inputmode="numeric" min="1" max="7" value="2"></div>
-        </div>
-        <p class="sum" id="planSum"></p>
-      </div>
-
-      <div class="grp" id="mentWrap" hidden>
-        <p class="gk">Their mentors</p>
-        <div class="chips" id="s-mentors"></div>
-        <p class="sum">Tick who teaches them. If a mentor has set their days, this student can only book inside them.</p>
-      </div>
-
-      <div class="grp" id="leftWrap" hidden>
-        <p class="gk">What they have left</p>
-        <div class="pair">
-          <div class="field"><label for="s-cleft">Classes left</label>
-            <input id="s-cleft" type="number" inputmode="numeric" min="0" value="12"></div>
-          <div class="field"><label for="s-pleft">Practice left</label>
-            <input id="s-pleft" type="number" inputmode="numeric" min="0" value="8"></div>
-        </div>
-        <p class="sum" id="leftSum"></p>
-      </div>
-      <p class="formmsg" id="sMsg" hidden></p>
-      <div class="row2">
-        <button class="btn ghost" id="sCancel" type="button">Cancel</button>
-        <button class="btn" id="sSave" type="submit">Save</button>
-      </div>
-    </form>
-
-    <div id="sExtra" hidden style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px;">
-      <button class="quiet" id="sWelcome" type="button">Send their welcome again &rarr;</button>
-      <button class="quiet" id="sNewCode" type="button">Give them a new code &rarr;</button>
-      <button class="quiet warn" id="sToggle" type="button">Switch off &mdash; course finished</button>
-    </div>
-
-    <div id="done" hidden style="display:flex;flex-direction:column;gap:14px;">
-      <div class="codebox"><b id="dCode"></b><span id="dNote">Their code for The Room</span></div>
-      <a class="btn" id="dWA" target="_blank" rel="noopener">Send welcome on WhatsApp</a>
-      <div class="row2">
-        <button class="btn ghost" id="dCopy" type="button">Copy code</button>
-        <button class="btn ghost" id="dClose" type="button">Done</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <a class="corner" id="corner" href="index.html">&larr; The Grey Room</a>
-<span class="demo-tag" id="demoTag" hidden>Demo &middot; passcode DEMO</span>
 
 <script>
 (function () {
-  var ENDPOINT = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec", DEMO = !ENDPOINT;
+  var ENDPOINT = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec";
   var $ = function (id) { return document.getElementById(id); };
-  var S = { key: null, list: [], cur: null, course: "DJ", mentors: [], mcur: null, sees: "Assigned" };
+  var M = { code: null, list: [], cur: null, kind: "Class", share: false };
+  function esc(t) { var d = document.createElement("div"); d.textContent = t == null ? "" : String(t); return d.innerHTML; }
 
-  // ---------------------------------------------------------------- demo
-  var demo = [
-    { row: 2, name: "Aniket Chhetri", phone: "9967579048", code: "K7MR4X", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 4, done: 4, upcoming: 1, active: true },
-    { row: 3, name: "Meher Kapoor", phone: "9811111111", code: "M3HQ8Z", course: "Production", total: 24, taught: 24, practice: 0, perWeek: 2, doneBefore: 9, done: 11, upcoming: 2, active: true },
-    { row: 4, name: "Old Student", phone: "9810876610", code: "P2WD7N", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 20, done: 20, upcoming: 0, active: false }
-  ];
-  function wait(v) { return new Promise(function (r) { setTimeout(function () { r(v); }, 300); }); }
-  function demoCode() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", c = ""; for (var i = 0; i < 6; i++) c += a[Math.floor(Math.random() * a.length)]; return c; }
-
-  // Google sometimes sits on a reply or hands back an error page instead of an
-  // answer. Reads give up after a few seconds and quietly ask again; writes
-  // (a booking, a save) are sent once and never repeated, so nothing doubles.
-  function send(url, obj) {
-    var READS = { portal_open: 1, portal_login: 1, portal_week: 1, trial_slots: 1, admin_students: 1, admin_login: 1 };
+  // Reads retry quietly; writes go once (nothing doubles).
+  function send(obj) {
+    var READS = { mentor_login: 1, mentor_student: 1 };
     var read = !!READS[obj.type], tries = read ? 3 : 1, limit = [12000, 15000, 20000];
     function go(i) {
       var ctl = window.AbortController ? new AbortController() : null;
       var t = ctl ? setTimeout(function () { ctl.abort(); }, read ? limit[i] : 45000) : null;
-      return fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-                          body: JSON.stringify(obj), signal: ctl ? ctl.signal : undefined })
+      return fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                               body: JSON.stringify(obj), signal: ctl ? ctl.signal : undefined })
         .then(function (r) { return r.text(); })
         .then(function (x) { if (t) clearTimeout(t); return JSON.parse(x); })
         .catch(function (e) { if (t) clearTimeout(t); if (i + 1 < tries) return go(i + 1); throw e; });
     }
     return go(0);
   }
-  function call(p) {
-    if (DEMO) {
-      if (String(p.key).toUpperCase() !== "DEMO") return wait({ ok: false, error: "That passcode isn't right." });
-      if (p.type === "admin_login") return wait({ ok: true });
-      if (p.type === "admin_students") return wait({ ok: true, students: JSON.parse(JSON.stringify(demo)) });
-      if (p.type === "admin_save") {
-        var s = p.student, digits = String(s.phone || "").replace(/\D/g, "").slice(-10);
-        if (!s.name) return wait({ ok: false, error: "Add their name." });
-        if (digits.length !== 10) return wait({ ok: false, error: "Their WhatsApp number needs 10 digits." });
-        var x = s.row ? demo.filter(function (d) { return d.row === s.row; })[0] : null;
-        if (!x) { x = { row: demo.length + 2, code: demoCode(), upcoming: 0 }; demo.push(x); }
-        x.name = s.name; x.phone = digits; x.course = s.course; x.taught = +s.classes; x.practice = +s.practice || 0; x.total = x.taught + x.practice; x.perWeek = +s.perWeek;
-        var viaRoom = (x.done || 0) - (x.doneBefore || 0); x.doneBefore = +s.doneBefore || 0; x.done = x.doneBefore + Math.max(0, viaRoom); x.active = s.active !== false;
-        return wait({ ok: true, student: JSON.parse(JSON.stringify(x)) });
-      }
-      if (p.type === "admin_newcode") { var y = demo.filter(function (d) { return d.row === p.row; })[0]; y.code = demoCode(); return wait({ ok: true, code: y.code }); }
-    }
-    return send(ENDPOINT, p);
-  }
-  function admin(type, extra) { var o = extra || {}; o.type = type; o.key = S.key; return call(o); }
+  function call(type, extra) { var o = extra || {}; o.type = type; o.code = M.code; return send(o); }
 
   // ---------------------------------------------------------------- door
-  $("gateForm").addEventListener("submit", function (e) {
+  $("doorForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    var k = $("key").value.trim();
-    if (!k) { $("gateMsg").textContent = "Enter your passcode."; return; }
-    $("gateBtn").disabled = true; $("gateMsg").textContent = "Checking…"; setTimeout(function () { if ($("gateMsg").textContent === "Checking…") $("gateMsg").textContent = "Waking the sheet up — a few more seconds…"; }, 6000);
-    // One trip, not two: the student list checks the passcode itself.
-    call({ type: "admin_students", key: k }).then(function (r) {
-      $("gateBtn").disabled = false;
-      if (!r.ok) { $("gateMsg").textContent = r.error || "That passcode isn't right."; try { localStorage.removeItem("gr_desk"); } catch (x) {} return; }
-      S.key = k; try { localStorage.setItem("gr_desk", k); } catch (x) {}
-      $("gate").hidden = true; $("corner").hidden = true; $("demoTag").hidden = true; $("desk").hidden = false;
-      S.list = r.students; draw(); loadMentors();
-    }).catch(function () { $("gateBtn").disabled = false; $("gateMsg").textContent = "Couldn't reach the sheet. Try again."; });
+    var code = $("code").value.trim().toUpperCase();
+    if (!code) { $("doorMsg").textContent = "Enter your code."; return; }
+    $("enter").disabled = true; $("doorMsg").textContent = "Checking…";
+    setTimeout(function () { if ($("doorMsg").textContent === "Checking…") $("doorMsg").textContent = "Waking the sheet up — a few more seconds…"; }, 6000);
+    M.code = code;
+    call("mentor_login").then(function (r) {
+      $("enter").disabled = false;
+      if (!r.ok) { $("doorMsg").textContent = r.error || "That code isn't recognised."; try { localStorage.removeItem("gr_mentor"); } catch (x) {} return; }
+      try { localStorage.setItem("gr_mentor", code); } catch (x) {}
+      M.list = r.students || [];
+      $("door").hidden = true; $("corner").hidden = true; $("main").hidden = false;
+      $("hello").textContent = "Hello, " + r.mentor.name.split(" ")[0] + ".";
+      var s = r.mentor.sees;
+      $("who").textContent = M.list.length + (M.list.length === 1 ? " student" : " students") + " · " +
+        (s === "Everyone" ? "everyone" : !s || s === "Assigned" ? "your students" : s.replace(/All /g, "all ") + " + yours");
+      drawList(); drawDays(r.mentor.available || "");
+    }).catch(function () { $("enter").disabled = false; $("doorMsg").textContent = "Couldn't reach the sheet. Try again."; });
   });
-  $("signout").addEventListener("click", function () { try { localStorage.removeItem("gr_desk"); } catch (x) {} location.reload(); });
+  $("signout").addEventListener("click", function () { try { localStorage.removeItem("gr_mentor"); } catch (x) {} location.reload(); });
 
   // ---------------------------------------------------------------- list
-  function esc(t) { var d = document.createElement("div"); d.textContent = t == null ? "" : String(t); return d.innerHTML; }
-  function load() {
-    admin("admin_students").then(function (r) {
-      if (!r.ok) { if (r.locked || /passcode/i.test(r.error || "")) { try { localStorage.removeItem("gr_desk"); } catch (x) {} location.reload(); } return; }
-      S.list = r.students; draw(); loadMentors();
-    });
-  }
-  // What's left, in the two parts of their plan.
   function left(s) {
-    var taught = s.taught == null ? s.total : s.taught, practice = s.practice || 0, done = s.done || 0;
-    return { classes: Math.max(0, taught - done), practice: Math.max(0, practice - Math.max(0, done - taught)) };
+    if (!s.classesLeft && !s.practiceLeft) return "course complete";
+    if (!s.classesLeft) return "practice · " + s.practiceLeft + " left";
+    return s.classesLeft + (s.classesLeft === 1 ? " class" : " classes") + " left" + (s.practiceLeft ? " + " + s.practiceLeft + " practice" : "");
   }
-  function line(s) {
-    var l = left(s), prog;
-    if (!s.total) prog = "";
-    else if (!l.classes && !l.practice) prog = "course complete";
-    else if (!l.classes) prog = "practice \u00b7 " + l.practice + " left";
-    else prog = l.classes + (l.classes === 1 ? " class" : " classes") + " left" + (l.practice ? " + " + l.practice + " practice" : "");
-    return [s.course, prog, s.upcoming ? s.upcoming + " booked" : ""].filter(Boolean).join(" · ");
-  }
-  function row(s) {
-    var b = document.createElement("button"); b.type = "button"; b.className = "person" + (s.active ? "" : " off");
-    b.innerHTML = "<div><b>" + esc(s.name) + "</b><span>" + esc(line(s)) + "</span></div><i>" + esc(s.code) + "</i>";
-    b.addEventListener("click", function () { edit(s); });
-    return b;
-  }
-  function draw() {
-    var on = S.list.filter(function (s) { return s.active; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
-    var off = S.list.filter(function (s) { return !s.active; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
-    $("count").textContent = on.length + " active" + (off.length ? " · " + off.length + " finished" : "");
-    var A = $("activeList"); A.innerHTML = "";
-    if (!on.length) A.innerHTML = '<p class="empty">No active students yet</p>';
-    else { var g = document.createElement("div"); g.className = "people"; on.forEach(function (s) { g.appendChild(row(s)); }); A.appendChild(g); }
-    $("offWrap").hidden = !off.length;
-    var F = $("offList"); F.innerHTML = "";
-    if (off.length) { var h = document.createElement("div"); h.className = "people"; off.forEach(function (s) { h.appendChild(row(s)); }); F.appendChild(h); }
-  }
-
-  // ---------------------------------------------------------------- form
-  function setCourse(v) {
-    S.course = v;
-    document.querySelectorAll("#s-course button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-v") === v ? "true" : "false"); });
-  }
-  // Course defaults for a new student. DJ: 12 taught classes + ~8 practice & revision, 2 a week (~45 days).
-  // Production: 24 classes, 2 a week (~90 days). Change the boxes for anyone who differs.
-  var DEFAULTS = { DJ: { classes: 12, practice: 8, week: 2 }, Production: { classes: 24, practice: 0, week: 2 },
-                   Vocals: { classes: 12, practice: 0, week: 1 } };   // Vocals: online with Shreya, 3 months, 1 a week
-  function num(id) { var v = Math.floor(+$(id).value); return isNaN(v) ? 0 : v; }
-  function setKind(v) {
-    S.kind = v;
-    document.querySelectorAll("#s-kind button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-v") === v ? "true" : "false"); });
-    $("leftWrap").hidden = v !== "old";
-    sums();
-  }
-  function fillPlan(d) {
-    $("s-classes").value = d.classes; $("s-practice").value = d.practice; $("s-week").value = d.week;
-    $("s-cleft").value = d.classes; $("s-pleft").value = d.practice; sums();
-  }
-  // The running totals under each group, so the numbers always add up in front of you.
-  function sums() {
-    var c = num("s-classes"), p = num("s-practice"), w = Math.max(1, num("s-week"));
-    var weeks = Math.ceil((c + p) / w);
-    $("planSum").innerHTML = "<b>" + (c + p) + " sessions</b> \u00b7 " + c + " classes" + (p ? " + " + p + " practice" : "") +
-      " \u00b7 about " + weeks + (weeks === 1 ? " week" : " weeks") + " at " + w + " a week";
-    if (S.kind === "old") {
-      var cl = num("s-cleft"), pl = num("s-pleft"), booked = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
-      var ahead = S.cur ? S.cur.upcoming || 0 : 0;
-      $("leftSum").innerHTML = "<b>" + (cl + pl) + " left</b> of " + (c + p) + " \u00b7 " + ((c + p) - (cl + pl)) + " done" +
-        (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
-    }
-  }
-  // "Left" can't be more than the plan - so if you type more left than the plan has, the plan grows to match.
-  $("s-cleft").addEventListener("input", function () { if (num("s-cleft") > num("s-classes")) $("s-classes").value = num("s-cleft"); });
-  $("s-pleft").addEventListener("input", function () { if (num("s-pleft") > num("s-practice")) $("s-practice").value = num("s-pleft"); });
-  ["s-classes", "s-practice", "s-week", "s-cleft", "s-pleft"].forEach(function (id) { $(id).addEventListener("input", sums); });
-  // Changing the plan of someone new keeps "left" equal to the whole plan.
-  ["s-classes", "s-practice"].forEach(function (id) { $(id).addEventListener("input", function () {
-    if (!S.cur && S.kind !== "old") { $("s-cleft").value = $("s-classes").value; $("s-pleft").value = $("s-practice").value; }
-  }); });
-  document.querySelectorAll("#s-kind button").forEach(function (b) { b.addEventListener("click", function () { setKind(b.getAttribute("data-v")); $("sMsg").hidden = true; }); });
-  document.querySelectorAll("#s-course button").forEach(function (b) { b.addEventListener("click", function () {
-    var v = b.getAttribute("data-v"); setCourse(v);
-    if (!S.cur && DEFAULTS[v]) fillPlan(DEFAULTS[v]);
-  }); });
-
-  function open(mode) {
-    $("panel").hidden = false; $("sform").hidden = mode === "done"; $("done").hidden = mode !== "done";
-    $("sExtra").hidden = mode !== "edit"; $("sMsg").hidden = true;
-    document.body.style.overflow = "hidden";
-    if (mode !== "done") setTimeout(function () { $("s-name").focus(); }, 50);
-  }
-  function close() { $("panel").hidden = true; document.body.style.overflow = ""; S.cur = null; }
-
-  $("addBtn").addEventListener("click", function () {
-    S.cur = null; $("pKick").textContent = "New student"; $("pTitle").textContent = "Add a student";
-    $("s-name").value = ""; $("s-phone").value = ""; setCourse("DJ");
-    $("kindWrap").hidden = false; fillPlan(DEFAULTS.DJ); setKind("new"); drawChips(""); $("sSave").textContent = "Add";
-    open("add");
-  });
-  function edit(s) {
-    S.cur = s; $("pKick").textContent = s.code + (s.active ? "" : " · switched off"); $("pTitle").textContent = s.name;
-    $("s-name").value = s.name; $("s-phone").value = s.phone; setCourse(s.course === "Production" || s.course === "Vocals" ? s.course : "DJ");
-    var taught = s.taught == null ? s.total : s.taught, l = left(s);
-    $("s-classes").value = taught; $("s-practice").value = s.practice || 0; $("s-week").value = s.perWeek;
-    $("s-cleft").value = l.classes; $("s-pleft").value = l.practice;
-    $("kindWrap").hidden = true; setKind("old"); drawChips(s.mentors); $("sSave").textContent = "Save";
-    $("sToggle").textContent = s.active ? "Switch off — course finished" : "Switch back on";
-    open("edit");
-  }
-  $("sCancel").addEventListener("click", close);
-  $("dClose").addEventListener("click", close);
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("panel").hidden) close(); if (e.key === "Escape" && !$("mpanel").hidden) mclose(); });
-
-  function payload(activeOverride) {
-    var c = num("s-classes"), p = num("s-practice");
-    var cl = S.kind === "old" ? num("s-cleft") : c, pl = S.kind === "old" ? num("s-pleft") : p;
-    // "Done before" is whatever isn't left and wasn't booked through The Room.
-    var viaRoom = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
-    var s = { name: $("s-name").value.trim(), phone: $("s-phone").value.trim(), course: S.course,
-              classes: c, practice: p, perWeek: $("s-week").value, mentors: chosenMentors(),
-              doneBefore: Math.max(0, (c - cl) + (p - pl) - viaRoom) };
-    if (S.cur) { s.row = S.cur.row; s.active = activeOverride === undefined ? S.cur.active : activeOverride; }
-    return s;
-  }
-  function say(t) { $("sMsg").textContent = t; $("sMsg").hidden = false; }
-  // an old error shouldn't sit there once they've started fixing it
-  $("sform").addEventListener("input", function () { $("sMsg").hidden = true; });
-  document.querySelectorAll("#s-course button").forEach(function (b) { b.addEventListener("click", function () { $("sMsg").hidden = true; }); });
-
-  $("sform").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var isNew = !S.cur, btn = $("sSave");
-    var c = num("s-classes"), p = num("s-practice"), cl = num("s-cleft"), pl = num("s-pleft");
-    if (c < 1) { say("Add how many classes are in their plan."); return; }
-    if (S.kind === "old") {
-      if (cl < 0 || cl > c) { say("Classes left can be 0 to " + c + "."); return; }
-      if (pl < 0 || pl > p) { say("Practice left can be 0 to " + p + "."); return; }
-      if (cl > 0 && pl < p) { say("Practice comes after the classes. If they've started practice, classes left is 0."); return; }
-    }
-    btn.disabled = true;
-    admin("admin_save", { student: payload() }).then(function (r) {
-      btn.disabled = false;
-      if (!r.ok) { say(r.error || "Couldn't save."); return; }
-      load();
-      if (isNew) showCode(r.student, "welcome"); else close();
-    }).catch(function () { btn.disabled = false; say("Couldn't reach the sheet. Nothing was saved."); });
-  });
-
-  $("sToggle").addEventListener("click", function () {
-    var s = S.cur; if (!s) return;
-    admin("admin_save", { student: payload(!s.active) }).then(function (r) {
-      if (!r.ok) { say(r.error || "Couldn't save."); return; }
-      close(); load();
-    });
-  });
-
-  $("sWelcome").addEventListener("click", function () { if (S.cur) showCode(S.cur, "welcome"); });
-  $("sNewCode").addEventListener("click", function () {
-    var s = S.cur; if (!s) return;
-    if (!confirm("Give " + s.name.split(" ")[0] + " a new code? The old one stops working straight away.")) return;
-    admin("admin_newcode", { row: s.row }).then(function (r) {
-      if (!r.ok) { say(r.error || "Couldn't make a new code."); return; }
-      s.code = r.code; load(); showCode(s, "newcode");
-    });
-  });
-
-  // ---------------------------------------------------------------- welcome
-  function first(n) { return String(n).trim().split(/\s+/)[0]; }
-  function welcome(s) {
-    return ["Welcome to The Grey Room, " + first(s.name) + ".", "",
-      "You're in. Your code for The Room is:", "", "*" + s.code + "*", "",
-      "The Room is where you book your sessions, see where you are in the course, find your practice task for the week, and read my notes after each class.", "",
-      "Getting in: go to greyroom.in and tap the second record in our logo — the second O in ROOM. Enter your code once and your phone remembers it. Add it to your home screen and you'll never have to find the door again.", "",
-      "You can book this week and next. If something comes up, cancel from The Room up to 24 hours before — after that, message me.", "",
-      "See you in the room.", "— Aamish"].join("\n");
-  }
-  function newCodeMsg(s) {
-    return "Hi " + first(s.name) + " — your new code for The Room is *" + s.code + "*. The old one doesn't work any more.";
-  }
-  function showCode(s, kind) {
-    S.cur = s;
-    $("pKick").textContent = kind === "newcode" ? "New code" : "Added";
-    $("pTitle").textContent = kind === "newcode" ? first(s.name) + "’s new code" : first(s.name) + " is in.";
-    $("dCode").textContent = s.code;
-    $("dNote").textContent = kind === "newcode" ? "The old code has stopped working" : "Their code for The Room";
-    $("dWA").textContent = kind === "newcode" ? "Send the new code on WhatsApp" : "Send welcome on WhatsApp";
-    $("dWA").href = "https://wa.me/91" + s.phone + "?text=" + encodeURIComponent(kind === "newcode" ? newCodeMsg(s) : welcome(s));
-    $("dCopy").textContent = "Copy code";
-    open("done");
-  }
-  $("dCopy").addEventListener("click", function () {
-    var c = $("dCode").textContent;
-    var ok = function () { $("dCopy").textContent = "Copied"; };
-    try { navigator.clipboard.writeText(c).then(ok, function () {}); } catch (x) {}
-  });
-
-  // ---------------------------------------------------------------- mentors
-  function loadMentors() {
-    admin("admin_mentors").then(function (r) { if (r && r.ok) { S.mentors = r.mentors || []; drawMentors(); } }).catch(function () {});
-  }
-  function seesText(v) {
-    if (!v || v === "Assigned") return "their students";
-    if (v === "Everyone") return "everyone";
-    return v.replace(/All /g, "all ") + " + their students";
-  }
-  function drawMentors() {
-    var box = $("mentorList"); box.innerHTML = "";
-    if (!S.mentors.length) { box.innerHTML = '<p class="empty">No mentors yet</p>'; return; }
-    var g = document.createElement("div"); g.className = "people";
-    S.mentors.slice().sort(function (a, b) { return (b.active - a.active) || a.name.localeCompare(b.name); }).forEach(function (m) {
-      var n = S.list.filter(function (s) { return s.active && sees(m, s); }).length;
-      var b = document.createElement("button"); b.type = "button"; b.className = "person" + (m.active ? "" : " off");
-      b.innerHTML = "<div><b>" + esc(m.name) + "</b><span>" + esc("Sees " + seesText(m.sees) + " · " + n + (n === 1 ? " student" : " students") +
-        (m.available ? " · " + m.available : " · days not set")) + "</span></div><i>" + esc(m.code) + "</i>";
-      b.addEventListener("click", function () { editMentor(m); });
-      g.appendChild(b);
-    });
-    box.appendChild(g);
-  }
-  function named(s) { return String(s.mentors || "").split(/[,;\n]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean); }
-  function sees(m, s) {
-    var v = m.sees || "";
-    if (/Everyone/.test(v)) return true;
-    if (/All DJ/.test(v) && s.course === "DJ") return true;
-    if (/All Production/.test(v) && s.course === "Production") return true;
-    if (/All Vocals/.test(v) && s.course === "Vocals") return true;
-    return named(s).indexOf(m.name.toLowerCase()) >= 0;
-  }
-  function setSees(v) {
-    var on = String(v || "").split(",").map(function (x) { return x.trim(); });
-    document.querySelectorAll("#m-sees button").forEach(function (b) { b.setAttribute("aria-pressed", on.indexOf(b.getAttribute("data-v")) >= 0 ? "true" : "false"); });
-    readSees();
-  }
-  function readSees() {
-    var on = [].slice.call(document.querySelectorAll("#m-sees button[aria-pressed='true']")).map(function (b) { return b.getAttribute("data-v"); });
-    S.sees = on.indexOf("Everyone") >= 0 ? "Everyone" : on.length ? on.join(", ") : "Assigned";
-  }
-  document.querySelectorAll("#m-sees button").forEach(function (b) { b.addEventListener("click", function () {
-    var now = b.getAttribute("aria-pressed") !== "true";
-    if (b.getAttribute("data-v") === "Everyone" && now) document.querySelectorAll("#m-sees button").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
-    else if (now) document.querySelector('#m-sees button[data-v="Everyone"]').setAttribute("aria-pressed", "false");
-    b.setAttribute("aria-pressed", now ? "true" : "false"); readSees(); $("mMsg").hidden = true;
-  }); });
-  function mopen(mode) {
-    $("mpanel").hidden = false; $("mform").hidden = mode === "done"; $("mDone").hidden = mode !== "done";
-    $("mExtra").hidden = mode !== "edit"; $("mMsg").hidden = true; document.body.style.overflow = "hidden";
-  }
-  function mclose() { $("mpanel").hidden = true; document.body.style.overflow = ""; S.mcur = null; }
-  $("addMentor").addEventListener("click", function () {
-    S.mcur = null; $("mKick").textContent = "New mentor"; $("mTitle").textContent = "Add a mentor";
-    $("m-name").value = ""; $("m-phone").value = ""; setSees(""); $("mDays").textContent = ""; $("mSave").textContent = "Add";
-    mopen("add"); setTimeout(function () { $("m-name").focus(); }, 50);
-  });
-  function editMentor(m) {
-    S.mcur = m; $("mKick").textContent = m.code + (m.active ? "" : " · switched off"); $("mTitle").textContent = m.name;
-    $("m-name").value = m.name; $("m-phone").value = m.phone; setSees(m.sees); $("mSave").textContent = "Save";
-    $("mDays").textContent = m.available ? "Their days: " + m.available : "They haven't set their days yet.";
-    $("mToggle").textContent = m.active ? "Switch off" : "Switch back on";
-    mopen("edit");
-  }
-  $("mCancel").addEventListener("click", mclose); $("mClose").addEventListener("click", mclose);
-  function mpay(active) {
-    var m = { name: $("m-name").value.trim(), phone: $("m-phone").value.trim(), sees: S.sees };
-    if (S.mcur) { m.row = S.mcur.row; m.active = active === undefined ? S.mcur.active : active; }
-    return m;
-  }
-  function mwelcome(m) {
-    return ["Welcome to The Grey Room, " + first(m.name) + ".", "",
-      "Your mentor code is:", "", "*" + m.code + "*", "",
-      "Getting in: go to greyroom.in and tap the FIRST record in our logo — the first O in ROOM. Enter your code once and your phone remembers it.", "",
-      "Inside you'll find your students, what they have left and what's coming up. Mark each class done or no-show, write your notes (private, or shared with the student), set their practice task — and set your days, so students only book when you're in.", "",
-      "— Aamish"].join("\n");
-  }
-  function mshow(m, kind) {
-    S.mcur = m; $("mKick").textContent = kind === "newcode" ? "New code" : "Added";
-    $("mTitle").textContent = kind === "newcode" ? first(m.name) + "’s new code" : first(m.name) + " is in.";
-    $("mCode").textContent = m.code; $("mNote").textContent = kind === "newcode" ? "The old code has stopped working" : "Their mentor code";
-    $("mWA").href = "https://wa.me/91" + m.phone + "?text=" + encodeURIComponent(kind === "newcode"
-      ? "Hi " + first(m.name) + " — your new mentor code is *" + m.code + "*. The old one doesn't work any more." : mwelcome(m));
-    $("mWA").textContent = kind === "newcode" ? "Send the new code on WhatsApp" : "Send welcome on WhatsApp";
-    mopen("done");
-  }
-  function msay(t) { $("mMsg").textContent = t; $("mMsg").hidden = false; }
-  $("mform").addEventListener("input", function () { $("mMsg").hidden = true; });
-  $("mform").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var isNew = !S.mcur, btn = $("mSave"); btn.disabled = true;
-    admin("admin_mentor_save", { mentor: mpay() }).then(function (r) {
-      btn.disabled = false;
-      if (!r.ok) { msay(r.error || "Couldn't save."); return; }
-      loadMentors(); if (isNew) mshow(r.mentor, "welcome"); else mclose();
-    }).catch(function () { btn.disabled = false; msay("Couldn't reach the sheet. Try again."); });
-  });
-  $("mWelcome").addEventListener("click", function () { if (S.mcur) mshow(S.mcur, "welcome"); });
-  $("mNewCode").addEventListener("click", function () {
-    var m = S.mcur; if (!m || !confirm("Give " + first(m.name) + " a new code? The old one stops working straight away.")) return;
-    admin("admin_mentor_code", { row: m.row }).then(function (r) {
-      if (!r.ok) { msay(r.error || "Couldn't do that."); return; }
-      m.code = r.code; loadMentors(); mshow(m, "newcode");
-    }).catch(function () { msay("Couldn't reach the sheet. Try again."); });
-  });
-  $("mToggle").addEventListener("click", function () {
-    var m = S.mcur; if (!m) return;
-    admin("admin_mentor_save", { mentor: mpay(!m.active) }).then(function (r) {
-      if (!r.ok) { msay(r.error || "Couldn't do that."); return; }
-      loadMentors(); mclose();
-    }).catch(function () { msay("Couldn't reach the sheet. Try again."); });
-  });
-  // the "Their mentors" chips on a student
-  function drawChips(current) {
-    var on = String(current || "").split(/[,;\n]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(Boolean);
-    var list = S.mentors.filter(function (m) { return m.active || on.indexOf(m.name.toLowerCase()) >= 0; });
-    $("mentWrap").hidden = !list.length;
-    var box = $("s-mentors"); box.innerHTML = "";
-    list.forEach(function (m) {
-      var b = document.createElement("button"); b.type = "button"; b.textContent = m.name;
-      b.setAttribute("aria-pressed", on.indexOf(m.name.toLowerCase()) >= 0 ? "true" : "false");
-      b.addEventListener("click", function () { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); });
+  function drawList() {
+    var q = $("search").value.trim().toLowerCase(), box = $("people");
+    var list = M.list.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) >= 0; });
+    $("count").textContent = M.list.length + " total";
+    box.innerHTML = list.length ? "" : '<p class="none" style="margin:0">' + (M.list.length ? "No one by that name" : "No students on your list yet") + "</p>";
+    list.forEach(function (s) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "person";
+      b.innerHTML = "<div><b>" + esc(s.name) + "</b><span>" + esc(s.course + " · " + left(s)) + "<br>" +
+        esc(s.next ? "Next: " + s.next : "Nothing booked") + "</span></div><i>" + esc(s.upcoming ? s.upcoming + " booked" : "") + "</i>";
+      b.addEventListener("click", function () { open(s.code); });
       box.appendChild(b);
     });
   }
-  function chosenMentors() {
-    return [].slice.call(document.querySelectorAll("#s-mentors button[aria-pressed='true']")).map(function (b) { return b.textContent; }).join(", ");
+  $("search").addEventListener("input", drawList);
+
+  // ---------------------------------------------------------------- your days
+  var DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  function hr(h) { return (h % 12 || 12) + " " + (h >= 12 && h < 24 ? "PM" : "AM"); }
+  function opts(sel) { var o = ""; for (var h = 8; h <= 23; h++) o += '<option value="' + h + '"' + (h === sel ? " selected" : "") + ">" + hr(h) + "</option>"; return o; }
+  function drawDays(text) {
+    var have = {};
+    String(text).split("·").forEach(function (p) { var m = p.trim().match(/^(\w{3})\s+(\d+)-(\d+)$/); if (m) have[m[1]] = [+m[2], +m[3]]; });
+    var box = $("days"); box.innerHTML = "";
+    DAYS.forEach(function (d) {
+      var on = !!have[d], v = have[d] || [12, 19];
+      var row = document.createElement("div"); row.className = "dayrow"; row.setAttribute("data-d", d);
+      row.innerHTML = '<button type="button" class="dbtn" aria-pressed="' + on + '">' + d + "</button>" +
+        '<select aria-label="' + d + ' from"' + (on ? "" : " disabled") + ">" + opts(v[0]) + "</select><i>to</i>" +
+        '<select aria-label="' + d + ' to"' + (on ? "" : " disabled") + ">" + opts(v[1]) + "</select>";
+      row.querySelector(".dbtn").addEventListener("click", function () {
+        var now = this.getAttribute("aria-pressed") !== "true"; this.setAttribute("aria-pressed", now ? "true" : "false");
+        row.querySelectorAll("select").forEach(function (x) { x.disabled = !now; });
+      });
+      box.appendChild(row);
+    });
   }
+  $("saveHours").addEventListener("click", function () {
+    var hours = [], bad = "";
+    document.querySelectorAll(".dayrow").forEach(function (r) {
+      if (r.querySelector(".dbtn").getAttribute("aria-pressed") !== "true") return;
+      var s = r.querySelectorAll("select"), f = +s[0].value, t = +s[1].value;
+      if (t <= f) bad = r.getAttribute("data-d"); else hours.push({ d: r.getAttribute("data-d"), from: f, to: t });
+    });
+    if (bad) { $("hoursMsg").textContent = bad + ": the end has to be after the start."; return; }
+    var btn = $("saveHours"); btn.disabled = true; $("hoursMsg").textContent = "Saving…";
+    call("mentor_hours", { hours: hours }).then(function (r) {
+      btn.disabled = false;
+      $("hoursMsg").textContent = r.ok ? (r.available ? "Saved — " + r.available : "Saved — no days set, so students you teach aren't limited.") : (r.error || "Couldn't save.");
+    }).catch(function () { btn.disabled = false; $("hoursMsg").textContent = "Couldn't reach the sheet."; });
+  });
+
+  // ---------------------------------------------------------------- one student
+  function open(code) {
+    M.cur = code;
+    $("listView").hidden = true; $("hoursView").hidden = true; $("oneView").hidden = false; window.scrollTo(0, 0);
+    var s = M.list.filter(function (x) { return x.code === code; })[0] || {};
+    $("sName").textContent = s.name || ""; $("sCourse").textContent = s.course || "";
+    $("stC").textContent = s.classesLeft != null ? s.classesLeft : "–"; $("stP").textContent = s.practiceLeft != null ? s.practiceLeft : "–";
+    $("stD").textContent = s.done != null ? s.done : "–"; $("stDl").textContent = s.total ? "Done of " + s.total : "Done";
+    $("sLine").innerHTML = "Loading…"; $("upList").innerHTML = ""; $("pastList").innerHTML = ""; $("noteList").innerHTML = "";
+    $("noteMsg").textContent = ""; $("taskMsg").textContent = "";
+    load(code);
+  }
+  function load(code) {
+    call("mentor_student", { student: code }).then(function (r) {
+      if (M.cur !== code) return;
+      if (!r.ok) { $("sLine").textContent = r.error || "Couldn't load."; return; }
+      draw(r.student);
+    }).catch(function () { $("sLine").textContent = "Couldn't reach the sheet. Go back and try again."; });
+  }
+  function draw(s) {
+    $("sName").textContent = s.name; $("sCourse").textContent = s.course;
+    $("stC").textContent = s.classesLeft; $("stP").textContent = s.practiceLeft;
+    $("stD").textContent = s.done; $("stDl").textContent = "Done of " + s.total;
+    $("stC").parentNode.className = s.classesLeft ? "on" : ""; $("stP").parentNode.className = !s.classesLeft && s.practiceLeft ? "on" : "";
+    $("sLine").innerHTML = esc(s.taught + " classes + " + s.practice + " practice · " + s.perWeek + " a week") +
+      (s.phone ? ' · <a href="https://wa.me/91' + esc(s.phone) + '" target="_blank" rel="noopener">WhatsApp ' + esc(s.name.split(" ")[0]) + "</a>" : "");
+    $("task").value = s.task || "";
+
+    $("upTag").textContent = s.upcoming.length ? s.upcoming.length + " booked" : "";
+    $("upList").innerHTML = s.upcoming.length ? "" : '<p class="none" style="margin:0">Nothing booked yet</p>';
+    s.upcoming.forEach(function (b) {
+      var d = document.createElement("div"); d.className = "row";
+      d.innerHTML = "<div><b>" + esc(b.date) + "</b><span>" + esc(b.time) + "</span></div>";
+      $("upList").appendChild(d);
+    });
+
+    $("pastList").innerHTML = s.past.length ? "" : '<p class="none" style="margin:0">No classes yet</p>';
+    s.past.forEach(function (b) {
+      var d = document.createElement("div"); d.className = "row";
+      var state = /^No-show/.test(b.attendance) ? "No-show" : /^Done/.test(b.attendance) ? "Done" : "";
+      d.innerHTML = "<div><b>" + esc(b.date) + "</b><span>" + esc(b.time + (b.attendance ? " · " + b.attendance : " · not marked")) + "</span></div>";
+      var seg = document.createElement("div"); seg.className = "mark2";
+      ["Done", "No-show"].forEach(function (v) {
+        var btn = document.createElement("button"); btn.type = "button"; btn.textContent = v;
+        btn.setAttribute("aria-pressed", state === v ? "true" : "false");
+        btn.addEventListener("click", function () {
+          var to = state === v ? "" : v;               // tap again to clear
+          seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === btn && to ? "true" : "false"); });
+          state = to;
+          d.querySelector("span").textContent = b.time + (to ? " · " + to : " · not marked");
+          call("mentor_mark", { student: s.code, row: b.row, attendance: to }).then(function (r) {
+            if (!r.ok) d.querySelector("span").textContent = r.error || "Couldn't save.";
+          }).catch(function () { d.querySelector("span").textContent = "Couldn't reach the sheet."; });
+        });
+        seg.appendChild(btn);
+      });
+      d.appendChild(seg); $("pastList").appendChild(d);
+    });
+
+    drawNotes(s.notes);
+  }
+  function drawNotes(notes) {
+    $("noteList").innerHTML = "";
+    $("noteList").hidden = !notes.length;
+    notes.forEach(function (n) {
+      var d = document.createElement("div"), when = new Date(n.at);
+      var day = when.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
+      d.innerHTML = "<b>" + esc(day + " · " + n.by) + '<span class="tag2">' + esc(n.kind) + '</span><span class="tag2' + (n.shared ? " pub" : "") + '">' +
+        (n.shared ? "Shared" : "Private") + "</span></b><span>" + esc(n.note) + "</span>";
+      $("noteList").appendChild(d);
+    });
+  }
+  $("back").addEventListener("click", function () {
+    stopDictation(); M.cur = null; $("oneView").hidden = true; $("listView").hidden = false; $("hoursView").hidden = false;
+    call("mentor_login").then(function (r) { if (r.ok) { M.list = r.students; drawList(); } }).catch(function () {});
+  });
+
+  // ---------------------------------------------------------------- notes
+  function seg(id, key) {
+    document.querySelectorAll("#" + id + " button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll("#" + id + " button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+        M[key] = key === "share" ? b.getAttribute("data-v") === "yes" : b.getAttribute("data-v");
+      });
+    });
+  }
+  seg("kind", "kind"); seg("share", "share");
+
+  // Speak it: the phone's own speech-to-text, straight into the box.
+  var Rec = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, base = "";
+  if (!Rec) $("dictate").hidden = true;
+  function stopDictation() { if (rec) { try { rec.stop(); } catch (e) {} } }
+  $("dictate").addEventListener("click", function () {
+    if (rec) { stopDictation(); return; }
+    rec = new Rec(); rec.lang = "en-IN"; rec.continuous = true; rec.interimResults = true;
+    base = $("noteText").value ? $("noteText").value.replace(/\s*$/, " ") : "";
+    rec.onresult = function (e) {
+      var fin = "", tmp = "";
+      for (var i = 0; i < e.results.length; i++) { (e.results[i].isFinal ? (fin += e.results[i][0].transcript) : (tmp += e.results[i][0].transcript)); }
+      $("noteText").value = base + fin + tmp;
+    };
+    rec.onend = function () { rec = null; $("dictate").textContent = "Speak it"; $("dictate").classList.remove("rec"); };
+    rec.onerror = function () { $("noteMsg").textContent = "The microphone didn't start — use the keyboard's mic instead."; };
+    try { rec.start(); $("dictate").textContent = "Stop"; $("dictate").classList.add("rec"); } catch (e) { rec = null; }
+  });
+
+  // Paste from Granola: copy the notes in Granola, tap once here.
+  $("paste").addEventListener("click", function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) { $("noteText").focus(); $("noteMsg").textContent = "Long-press the box and choose Paste."; return; }
+    navigator.clipboard.readText().then(function (t) {
+      if (!t) { $("noteMsg").textContent = "Nothing copied yet — copy the note in Granola first."; return; }
+      $("noteText").value = ($("noteText").value ? $("noteText").value.replace(/\s*$/, "\n\n") : "") + t.trim();
+      $("noteMsg").textContent = "Pasted. Check it, then save.";
+    }).catch(function () { $("noteText").focus(); $("noteMsg").textContent = "Long-press the box and choose Paste."; });
+  });
+
+  $("saveNote").addEventListener("click", function () {
+    var text = $("noteText").value.trim();
+    if (!text) { $("noteMsg").textContent = "Write the note first."; return; }
+    stopDictation();
+    var btn = $("saveNote"), code = M.cur; btn.disabled = true; $("noteMsg").textContent = "Saving…";
+    call("mentor_note", { student: code, note: text, kind: M.kind, shared: M.share,
+                          source: /granola/i.test($("noteMsg").textContent) ? "Granola" : "Mentor" }).then(function (r) {
+      btn.disabled = false;
+      if (!r.ok) { $("noteMsg").textContent = r.error || "Couldn't save."; return; }
+      $("noteText").value = ""; $("noteMsg").textContent = M.share ? "Saved — they'll see it in The Room." : "Saved — private.";
+      load(code);
+    }).catch(function () { btn.disabled = false; $("noteMsg").textContent = "Couldn't reach the sheet — your note is still in the box."; });
+  });
+
+  $("saveTask").addEventListener("click", function () {
+    var btn = $("saveTask"); btn.disabled = true; $("taskMsg").textContent = "Saving…";
+    call("mentor_task", { student: M.cur, task: $("task").value.trim() }).then(function (r) {
+      btn.disabled = false; $("taskMsg").textContent = r.ok ? "Saved — it's their task now." : (r.error || "Couldn't save.");
+    }).catch(function () { btn.disabled = false; $("taskMsg").textContent = "Couldn't reach the sheet."; });
+  });
 
   // ---------------------------------------------------------------- start
-  if (DEMO) $("demoTag").hidden = false;
-  else { try { fetch(ENDPOINT).catch(function () {}); } catch (x) {} }   // wake the script while the passcode is typed
-  try { var saved = localStorage.getItem("gr_desk"); if (saved) { $("key").value = saved; $("gateForm").requestSubmit(); } } catch (x) {}
+  try { fetch(ENDPOINT).catch(function () {}); } catch (e) {}
+  try { var saved = localStorage.getItem("gr_mentor"); if (saved) { $("code").value = saved; $("doorForm").requestSubmit(); } } catch (err) {}
 })();
 </script>

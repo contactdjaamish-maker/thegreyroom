@@ -434,8 +434,8 @@
     <div id="secNotes" hidden>
     <hr>
     <section>
-      <div class="sec-head"><h2>From Aamish</h2><span class="fill"></span>
-        <span class="tag">After each session</span></div>
+      <div class="sec-head"><h2>Notes for you</h2><span class="fill"></span>
+        <span class="tag">From Aamish &amp; your mentors</span></div>
       <div class="notes" id="notes"></div>
     </section>
     </div>
@@ -574,6 +574,24 @@
   function wait(v) { return new Promise(function (r) { setTimeout(function () { r(v); }, 380); }); }
 
   // ---------------------------------------------------------------- backend
+
+  // Google sometimes sits on a reply or hands back an error page instead of an
+  // answer. Reads give up after a few seconds and quietly ask again; writes
+  // (a booking, a save) are sent once and never repeated, so nothing doubles.
+  function send(url, obj) {
+    var READS = { portal_open: 1, portal_login: 1, portal_week: 1, trial_slots: 1, admin_students: 1, admin_login: 1 };
+    var read = !!READS[obj.type], tries = read ? 3 : 1, limit = [12000, 15000, 20000];
+    function go(i) {
+      var ctl = window.AbortController ? new AbortController() : null;
+      var t = ctl ? setTimeout(function () { ctl.abort(); }, read ? limit[i] : 45000) : null;
+      return fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                          body: JSON.stringify(obj), signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { return r.text(); })
+        .then(function (x) { if (t) clearTimeout(t); return JSON.parse(x); })
+        .catch(function (e) { if (t) clearTimeout(t); if (i + 1 < tries) return go(i + 1); throw e; });
+    }
+    return go(0);
+  }
   function call(payload) {
     if (DEMO) {
       if (payload.type === "portal_login") {
@@ -587,8 +605,7 @@
       if (payload.type === "portal_book") { demoBooked[payload.slot] = true; return wait({ ok: true }); }
       if (payload.type === "portal_cancel") { delete demoBooked[payload.slot]; return wait({ ok: true }); }
     }
-    return fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-                             body: JSON.stringify(payload) }).then(function (r) { return r.json(); });
+    return send(ENDPOINT, payload);
   }
 
   // ---------------------------------------------------------------- door
@@ -602,7 +619,7 @@
       S.code = code; S.student = cached.student; S.profile = cached.profile; S.weeks = cached.weeks || [null, null]; S.fresh = false; S.len = cached.len || S.len;
       openWeek();
     } else {
-      $("enter").disabled = true; $("doorMsg").textContent = "Checking…";
+      $("enter").disabled = true; $("doorMsg").textContent = "Checking…"; setTimeout(function () { if ($("doorMsg").textContent === "Checking…") $("doorMsg").textContent = "Waking the sheet up — a few more seconds…"; }, 6000);
     }
     openAll(code).then(function (r) {
       $("enter").disabled = false;
@@ -633,7 +650,7 @@
     var pr = S.profile || {};
     $("who").textContent = st.course + (st.total && st.done >= st.total ? " \u00b7 course complete"
       : (pr.phase === "practice" ? " \u00b7 practice & revision" : "") + " \u00b7 session " + (st.done + 1) + " of " + st.total);
-    $("allow").textContent = st.perWeek + " a week \u00b7 " + S.len + " hours each";
+    $("allow").textContent = st.perWeek + " a week \u00b7 " + S.len + (S.len === 1 ? " hour" : " hours") + " each";
   }
 
   $("signout").addEventListener("click", function () {
