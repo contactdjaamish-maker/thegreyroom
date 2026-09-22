@@ -468,7 +468,40 @@
   var DEMO = !ENDPOINT;
 
   var $ = function (id) { return document.getElementById(id); };
-  var S = { code: null, student: null, week: 0, slots: [], mine: [], pick: null };
+  var S = { code: null, student: null, week: 0, slots: [], mine: [], pick: null, weeks: [null, null], fresh: false };
+
+  // Speed. Google's script takes ~3 s a call, more when it has been asleep.
+  // So: everything is asked for at once, the last good copy is shown
+  // instantly on return visits, and nothing is fetched twice.
+  var CACHE = "gr_room";
+  function saveCache() {
+    try { localStorage.setItem(CACHE, JSON.stringify({ code: S.code, student: S.student, profile: S.profile, weeks: S.weeks, t: Date.now() })); } catch (err) {}
+  }
+  function readCache(code) {
+    try {
+      var c = JSON.parse(localStorage.getItem(CACHE) || "null");
+      // a day old at most, and never someone else's
+      if (c && c.code === code && Date.now() - c.t < 24 * 3600 * 1000) return c;
+    } catch (err) {}
+    return null;
+  }
+  function weeksFor(code) {
+    return Promise.all([call({ type: "portal_week", code: code, week: 0 }), call({ type: "portal_week", code: code, week: 1 })]);
+  }
+  // One trip for everything (portal_open). If the script is an older copy
+  // that doesn't know it yet, fall back to three trips at once.
+  var FAST = true;
+  function openAll(code) {
+    if (FAST) return call({ type: "portal_open", code: code }).then(function (r) {
+      if (r && !r.ok && /Unknown request/.test(r.error || "")) { FAST = false; return openAll(code); }
+      return r;
+    });
+    return Promise.all([call({ type: "portal_login", code: code }), weeksFor(code)]).then(function (x) {
+      var r = x[0], rs = x[1];
+      if (r.ok && rs[0].ok && rs[1].ok) r.weeks = [rs[0].slots, rs[1].slots];
+      return r;
+    });
+  }
 
   // ---------------------------------------------------------------- dates
   var DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -538,6 +571,8 @@
           : { ok: false, error: "That code isn't recognised." });
       }
       if (payload.type === "portal_week") return wait({ ok: true, slots: demoSlots(payload.week) });
+      if (payload.type === "portal_open") return call({ type: "portal_login", code: payload.code }).then(function (r) {
+        if (r.ok) r.weeks = [demoSlots(0), demoSlots(1)]; return r; });
       if (payload.type === "portal_book") { demoBooked[payload.slot] = true; return wait({ ok: true }); }
       if (payload.type === "portal_cancel") { delete demoBooked[payload.slot]; return wait({ ok: true }); }
     }
@@ -550,29 +585,46 @@
     e.preventDefault();
     var code = $("code").value.trim().toUpperCase();
     if (!code) { $("doorMsg").textContent = "Enter your code."; return; }
-    $("enter").disabled = true; $("doorMsg").textContent = "Checking…";
-    call({ type: "portal_login", code: code }).then(function (r) {
+    var cached = readCache(code);
+    if (cached) {
+      // Straight in with the last copy; the fresh one replaces it in a moment.
+      S.code = code; S.student = cached.student; S.profile = cached.profile; S.weeks = cached.weeks || [null, null]; S.fresh = false;
+      openWeek();
+    } else {
+      $("enter").disabled = true; $("doorMsg").textContent = "Checking…";
+    }
+    openAll(code).then(function (r) {
       $("enter").disabled = false;
-      if (!r.ok) { $("doorMsg").textContent = r.error || "That code isn't recognised."; return; }
+      if (!r.ok) {
+        try { localStorage.removeItem(CACHE); if (cached) localStorage.removeItem("gr_code"); } catch (err) {}
+        if (cached) { location.reload(); return; }
+        $("doorMsg").textContent = r.error || "That code isn't recognised."; return;
+      }
       S.code = code; S.student = r.student; S.profile = r.profile || null;
       try { localStorage.setItem("gr_code", code); } catch (err) {}
-      openWeek();
-    }).catch(function () { $("enter").disabled = false; $("doorMsg").textContent = "Couldn't reach the room. Try again."; });
+      if (r.weeks) { S.weeks = r.weeks; S.fresh = true; }
+      if (cached) { drawHead(); drawProfile(S.profile); show(); } else openWeek();
+      if (r.weeks) saveCache();
+    }).catch(function () {
+      $("enter").disabled = false;
+      if (!cached) $("doorMsg").textContent = "Couldn't reach the room. Try again.";
+    });
   });
 
   function openWeek() {
     $("door").hidden = true; $("corner").hidden = true; $("demoTag").hidden = true; $("week").hidden = false;
+    drawHead(); drawProfile(S.profile); show();
+  }
+  function drawHead() {
     var st = S.student;
     $("hello").textContent = "Hello, " + st.name + ".";
     $("who").textContent = st.course + (st.total && st.done >= st.total
       ? " \u00b7 course complete" : " \u00b7 session " + (st.done + 1) + " of " + st.total);
     $("allow").textContent = st.perWeek + " a week";
-    drawProfile(S.profile);
-    load();
   }
 
   $("signout").addEventListener("click", function () {
-    try { localStorage.removeItem("gr_code"); } catch (err) {}
+    try { localStorage.removeItem("gr_code"); localStorage.removeItem(CACHE); } catch (err) {}
     location.reload();
   });
 
@@ -619,19 +671,30 @@
     b.addEventListener("click", function () {
       S.week = +b.getAttribute("data-w");
       document.querySelectorAll(".tabs button").forEach(function (x) { x.setAttribute("aria-selected", x === b ? "true" : "false"); });
-      load();
+      show();
     });
   });
 
+  // Draw from what we have. Nothing yet = the one and only "Loading".
+  function show() {
+    var w = S.weeks;
+    if (!w[0] || !w[1]) { $("days").innerHTML = '<p class="closed">Loading…</p>'; return; }
+    S.mine = w[0].concat(w[1]).filter(function (s) { return s.status === "mine"; });
+    S.slots = w[S.week] || [];
+    drawMine(); drawDays();
+  }
+  // Refresh quietly in the background - the page never blanks.
   function load() {
-    $("days").innerHTML = '<p class="closed">Loading…</p>';
-    Promise.all([call({ type: "portal_week", code: S.code, week: 0 }),
-                 call({ type: "portal_week", code: S.code, week: 1 })]).then(function (rs) {
-      var all = rs[0].slots.concat(rs[1].slots);
-      S.mine = all.filter(function (s) { return s.status === "mine"; });
-      S.slots = S.week === 0 ? rs[0].slots : rs[1].slots;
-      drawMine(); drawDays();
-    });
+    openAll(S.code).then(function (r) {
+      if (!r || !r.ok || !r.weeks) return;
+      S.student = r.student; S.profile = r.profile || S.profile; S.weeks = r.weeks; S.fresh = true;
+      drawHead(); drawProfile(S.profile); show(); saveCache();
+    }).catch(function () {});
+  }
+  // Change one slot here and now, before the server has answered.
+  function mark(id, status) {
+    [0, 1].forEach(function (i) { (S.weeks[i] || []).forEach(function (x) { if (x.id === id) x.status = status; }); });
+    show();
   }
 
   function label(s) { var d = new Date(s.date + "T00:00"); return LONG[d.getDay()] + " " + nice(d); }
@@ -743,7 +806,7 @@
         if (!r.ok) { $("sheetK").textContent = "Couldn't cancel"; $("sheetD").textContent = r.error || "Message Aamish instead."; sheet("note"); return; }
         $("sheetK").textContent = "Cancelled \u00b7 one last step";
         $("sheetD").textContent = "Send this so Aamish knows the slot is free.";
-        tellAamish("cancelled", s); load();
+        mark(s.id, "open"); tellAamish("cancelled", s); load();
       });
       return;
     }
@@ -753,7 +816,7 @@
       if (!r.ok) { $("sheetK").textContent = "Couldn't book"; $("sheetD").textContent = r.error || "Someone took it first. Pick another time."; sheet("note"); load(); return; }
       $("sheetK").textContent = "Booked \u00b7 one last step";
       $("sheetD").textContent = hr(s.hour) + " \u00b7 " + s.at + ". Send this so Aamish sees it on WhatsApp.";
-      tellAamish("session booked", s); load();
+      mark(s.id, "mine"); tellAamish("session booked", s); load();
     });
   });
 
@@ -768,6 +831,8 @@
 
   // ---------------------------------------------------------------- start
   if (DEMO) $("demoTag").hidden = false;
+  // Wake Google's script up while they type their code.
+  if (!DEMO) { try { fetch(ENDPOINT, { method: "GET" }).catch(function () {}); } catch (err) {} }
   try {
     var saved = localStorage.getItem("gr_code");
     if (saved) { $("code").value = saved; $("doorForm").requestSubmit(); }
