@@ -412,7 +412,7 @@
       <div class="practice"><b>Before your next session</b><span id="task"></span></div>
     </section>
     <hr>
-    <section>
+    <section id="secBook">
       <div class="sec-head"><h2>Book</h2><span class="fill"></span>
         <span class="tag" id="bookTag">Tap a time</span></div>
       <div class="tabs" role="tablist">
@@ -420,6 +420,16 @@
         <button type="button" role="tab" data-w="1" aria-selected="false">Next week</button>
       </div>
       <div id="days"></div>
+    </section>
+
+    <section id="secFinished" hidden>
+      <div class="sec-head"><h2>Your course</h2><span class="fill"></span>
+        <span class="tag">Finished</span></div>
+      <div class="practice"><b>You have used every session on your plan</b><span>Everything above stays here
+        &mdash; your sessions, your notes, where you got to. For more practice time or something new,
+        message Aamish and he will open it up again.</span></div>
+      <a class="btn" id="finWA" target="_blank" rel="noopener"
+         style="text-align:center;text-decoration:none;margin-top:14px;display:block;">Message Aamish &rarr;</a>
     </section>
 
     <div id="secSyl" hidden>
@@ -465,7 +475,7 @@
     <button class="btn ghost" id="sheetNo" type="button">Not this one</button>
     <button class="btn" id="sheetYes" type="button">Book it</button>
   </div>
-  <a class="btn" id="sheetWA" hidden target="_blank" rel="noopener" style="text-align:center;text-decoration:none;">Send on WhatsApp</a>
+  <a class="btn" id="sheetWA" hidden target="_blank" rel="noopener" style="text-align:center;text-decoration:none;">Open WhatsApp &rarr;</a>
   <button class="btn ghost" id="sheetDone" type="button" hidden>Done</button>
 </div>
 
@@ -486,7 +496,7 @@
   // instantly on return visits, and nothing is fetched twice.
   var CACHE = "gr_room";
   function saveCache() {
-    try { localStorage.setItem(CACHE, JSON.stringify({ code: S.code, student: S.student, profile: S.profile, weeks: S.weeks, len: S.len, t: Date.now() })); } catch (err) {}
+    try { localStorage.setItem(CACHE, JSON.stringify({ code: S.code, student: S.student, profile: S.profile, weeks: S.weeks, len: S.len, finished: !!S.finished, left: S.left, t: Date.now() })); } catch (err) {}
   }
   function readCache(code) {
     try {
@@ -617,6 +627,7 @@
     if (cached) {
       // Straight in with the last copy; the fresh one replaces it in a moment.
       S.code = code; S.student = cached.student; S.profile = cached.profile; S.weeks = cached.weeks || [null, null]; S.fresh = false; S.len = cached.len || S.len;
+      S.finished = !!cached.finished; S.left = cached.left;
       openWeek();
     } else {
       $("enter").disabled = true; $("doorMsg").textContent = "Checking…"; setTimeout(function () { if ($("doorMsg").textContent === "Checking…") $("doorMsg").textContent = "Waking the sheet up — a few more seconds…"; }, 6000);
@@ -628,7 +639,7 @@
         if (cached) { location.reload(); return; }
         $("doorMsg").textContent = r.error || "That code isn't recognised."; return;
       }
-      S.code = code; S.student = r.student; S.profile = r.profile || null;
+      S.code = code; S.student = r.student; S.profile = r.profile || null; S.finished = !!r.finished; S.left = r.left;
       try { localStorage.setItem("gr_code", code); } catch (err) {}
       if (r.weeks) { S.weeks = r.weeks; S.fresh = true; }
       if (r.hours) S.len = r.hours;
@@ -650,7 +661,18 @@
     var pr = S.profile || {};
     $("who").textContent = st.course + (st.total && st.done >= st.total ? " \u00b7 course complete"
       : (pr.phase === "practice" ? " \u00b7 practice & revision" : "") + " \u00b7 session " + (st.done + 1) + " of " + st.total);
-    $("allow").textContent = st.perWeek + " a week \u00b7 " + S.len + (S.len === 1 ? " hour" : " hours") + " each";
+    // Someone who has finished the taught classes usually still has practice &
+    // revision sessions, and those are booked the usual way. The room only
+    // closes once there is nothing left on their plan at all.
+    var over = S.left != null ? S.left <= 0 : (st.total && st.done >= st.total);
+    $("allow").textContent = over ? "Nothing left to book"
+      : S.finished ? "Practice & revision \u00b7 " + (S.left != null ? S.left + " left" : "book as usual")
+      : st.perWeek + " a week \u00b7 " + S.len + (S.len === 1 ? " hour" : " hours") + " each";
+    $("bookTag").textContent = S.finished ? "Practice \u00b7 tap a time" : "Tap a time";
+    $("secBook").hidden = !!over;
+    $("secFinished").hidden = !over;
+    $("finWA").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
+      "Hi Aamish \u2014 " + (st.name || "") + " here. I have used all my sessions and would like to carry on.");
   }
 
   $("signout").addEventListener("click", function () {
@@ -717,7 +739,7 @@
   function load() {
     openAll(S.code).then(function (r) {
       if (!r || !r.ok || !r.weeks) return;
-      S.student = r.student; S.profile = r.profile || S.profile; S.weeks = r.weeks; S.fresh = true;
+      S.student = r.student; S.profile = r.profile || S.profile; S.weeks = r.weeks; S.fresh = true; S.finished = !!r.finished; S.left = r.left;
       if (r.hours) S.len = r.hours;
       drawHead(); drawProfile(S.profile); show(); saveCache();
     }).catch(function () {});
@@ -792,22 +814,44 @@
   function sheet(mode) {
     $("sheet").hidden = false;
     $("sheetBtns").hidden = mode !== "ask";
-    $("sheetWA").hidden = mode !== "done";
-    // After a booking or a cancel, WhatsApp is the only way out: the message
-    // from their own number is how Aamish hears about it. Done appears once sent.
+    // Booking and cancelling both hand the student straight to WhatsApp with
+    // the message written out - same as the trial form on the main page. The
+    // row, the calendar event and Aamish's email all happen server-side; this
+    // is the text on his phone, sent from their own number.
+    $("sheetWA").hidden = mode !== "tell";
     $("sheetDone").hidden = mode !== "note";
+  }
+
+  // Opened on the tap itself so the browser counts it as a user action; the
+  // address is filled in once the booking comes back. Blocked or unsupported,
+  // it stays null and we navigate this tab instead.
+  var waTab = null;
+  function openWA(url) {
+    try {
+      if (waTab && !waTab.closed) { waTab.location.href = url; waTab.focus(); return; }
+    } catch (e) {}
+    try {
+      var w = window.open(url, "_blank");
+      if (w) { waTab = w; return; }
+    } catch (e) {}
+    window.location.href = url;          // last resort: leave the page
+  }
+  function dropTab() {
+    try { if (waTab && !waTab.closed) waTab.close(); } catch (e) {}
+    waTab = null;
   }
   function tellAamish(head, s) {
     var st = S.student || {};
-    $("sheetWA").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
+    var url = "https://wa.me/" + WA + "?text=" + encodeURIComponent(
       "The Grey Room \u2014 " + head + "\n\n" + (st.name || "") + (st.course ? " \u00b7 " + st.course : "") + "\n" +
       label(s) + "\n" + span(s) + " \u00b7 " + s.at);
-    $("sheetWA").textContent = "Send to Aamish on WhatsApp";
-    sheet("done");
+    $("sheetWA").href = url;
+    sheet("tell");
+    openWA(url);
+    // If WhatsApp never came up - no app, an in-app browser, a blocked tab -
+    // the tappable link above is the way through, and Done gets them out.
+    setTimeout(function () { $("sheetDone").hidden = false; }, 2500);
   }
-  $("sheetWA").addEventListener("click", function () {
-    setTimeout(function () { $("sheetDone").hidden = false; $("sheetWA").textContent = "Send again"; }, 600);
-  });
   function closeSheet() {
     $("sheet").hidden = true; S.pick = null;
     document.querySelectorAll(".slot.sel").forEach(function (x) { x.classList.remove("sel"); });
@@ -822,7 +866,7 @@
     $("sheetNo").textContent = "Not this one"; $("sheetYes").textContent = "Book it";
     $("sheetK").textContent = "Book this session";
     $("sheetTitle").textContent = label(s);
-    $("sheetD").textContent = span(s) + " · " + s.at + " · " + S.len + " hours";
+    $("sheetD").textContent = span(s) + " · " + s.at + " · " + S.len + " hours. WhatsApp opens after, with the message written out for Aamish.";
     sheet("ask");
   }
   $("sheetNo").addEventListener("click", closeSheet);
@@ -831,13 +875,17 @@
   $("sheetYes").addEventListener("click", function () {
     var s = S.pick; if (!s) return;
     var btn = $("sheetYes"); btn.disabled = true;
+    // Claim the tab now, while this tap still counts as a user action. It is
+    // pointed at WhatsApp the moment the booking comes back, and closed again
+    // if it did not go through.
+    try { waTab = window.open("", "_blank") || null; } catch (e) { waTab = null; }
     if (S.mode === "cancel") {
       btn.textContent = "Cancelling…";
       call({ type: "portal_cancel", code: S.code, slot: s.id }).then(function (r) {
         btn.disabled = false;
-        if (!r.ok) { $("sheetK").textContent = "Couldn't cancel"; $("sheetD").textContent = r.error || "Message Aamish instead."; sheet("note"); return; }
-        $("sheetK").textContent = "Cancelled \u00b7 one last step";
-        $("sheetD").textContent = "Send this so Aamish knows the slot is free.";
+        if (!r.ok) { $("sheetK").textContent = "Couldn't cancel"; $("sheetD").textContent = r.error || "Message Aamish instead."; dropTab(); sheet("note"); return; }
+        $("sheetK").textContent = "Cancelled \u00b7 telling Aamish";
+        $("sheetD").textContent = "The slot is open again. WhatsApp is opening with the message written out \u2014 just hit send.";
         mark(s.id, "open"); tellAamish("cancelled", s); load();
       });
       return;
@@ -845,9 +893,9 @@
     btn.textContent = "Booking…";
     call({ type: "portal_book", code: S.code, slot: s.id }).then(function (r) {
       btn.disabled = false;
-      if (!r.ok) { $("sheetK").textContent = "Couldn't book"; $("sheetD").textContent = r.error || "Someone took it first. Pick another time."; sheet("note"); load(); return; }
-      $("sheetK").textContent = "Booked \u00b7 one last step";
-      $("sheetD").textContent = span(s) + " \u00b7 " + s.at + ". Send this so Aamish sees it on WhatsApp.";
+      if (!r.ok) { $("sheetK").textContent = "Couldn't book"; $("sheetD").textContent = r.error || "Someone took it first. Pick another time."; dropTab(); sheet("note"); load(); return; }
+      $("sheetK").textContent = "Booked \u00b7 telling Aamish";
+      $("sheetD").textContent = span(s) + " \u00b7 " + s.at + " is yours. WhatsApp is opening with the message written out \u2014 just hit send.";
       mark(s.id, "mine"); tellAamish("session booked", s); load();
     });
   });

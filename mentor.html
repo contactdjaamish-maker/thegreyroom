@@ -375,6 +375,8 @@
   .person{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--black);
           padding:14px 16px;border:0;color:var(--ink);text-align:left;cursor:pointer;width:100%;margin:0;}
   .person:hover,.person:focus-visible{background:var(--grey);}
+  .person.fin b{text-decoration:line-through;text-decoration-thickness:1px;opacity:.7;}
+  .person.fin span,.person.fin i{opacity:.55;}
   .person b{display:block;font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:1.1rem;line-height:1.05;}
   .person span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:5px;line-height:1.6;}
   .person i{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);white-space:nowrap;}
@@ -592,15 +594,29 @@
     if (!s.classesLeft) return "practice · " + s.practiceLeft + " left";
     return s.classesLeft + (s.classesLeft === 1 ? " class" : " classes") + " left" + (s.practiceLeft ? " + " + s.practiceLeft + " practice" : "");
   }
+  function fin(s) { return s.stage === "finished"; }
   function drawList() {
     var q = $("search").value.trim().toLowerCase(), box = $("people");
     var list = M.list.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) >= 0; });
-    $("count").textContent = M.list.length + " total";
+    // Students still learning first; the ones who finished sit underneath,
+    // struck through, so the list reads at a glance.
+    list = list.filter(function (s) { return !fin(s); }).concat(list.filter(fin));
+    var live = M.list.filter(function (s) { return !fin(s); }).length, done = M.list.length - live;
+    $("count").textContent = live + " learning" + (done ? " \u00b7 " + done + " finished" : "");
     box.innerHTML = list.length ? "" : '<p class="none" style="margin:0">' + (M.list.length ? "No one by that name" : "No students on your list yet") + "</p>";
+    var split = false;
     list.forEach(function (s) {
-      var b = document.createElement("button"); b.type = "button"; b.className = "person";
-      b.innerHTML = "<div><b>" + esc(s.name) + "</b><span>" + esc(s.course + " · " + left(s)) + "<br>" +
-        esc(s.next ? "Next: " + s.next : "Nothing booked") + "</span></div><i>" + esc(s.upcoming ? s.upcoming + " booked" : "") + "</i>";
+      if (fin(s) && !split && !q) {
+        split = true;
+        var h = document.createElement("p"); h.className = "none";
+        h.style.cssText = "margin:18px 0 8px;";
+        h.textContent = "Finished the course";
+        box.appendChild(h);
+      }
+      var b = document.createElement("button"); b.type = "button"; b.className = "person" + (fin(s) ? " fin" : "");
+      b.innerHTML = "<div><b>" + esc(s.name) + "</b><span>" + esc(s.course + " \u00b7 " + (fin(s) ? "course finished" : left(s))) + "<br>" +
+        esc(fin(s) ? s.done + " sessions in all" : s.next ? "Next: " + s.next : "Nothing booked") + "</span></div><i>" +
+        esc(fin(s) ? "" : s.upcoming ? s.upcoming + " booked" : "") + "</i>";
       b.addEventListener("click", function () { open(s.code); });
       box.appendChild(b);
     });

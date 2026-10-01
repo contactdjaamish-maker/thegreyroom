@@ -286,6 +286,12 @@
                color:var(--dim);margin-top:6px;}
   .person i{font-style:normal;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.18em;color:var(--ink);}
   .person.off b,.person.off i{opacity:.4;}
+  /* finished: the name is struck, the way a taken slot is - done, not gone */
+  .person.fin b{text-decoration:line-through;text-decoration-thickness:1px;opacity:.72;}
+  .person.fin i{opacity:.55;}
+  .person .chip{display:inline-block;margin-left:8px;font-family:var(--mono);font-size:8.5px;font-weight:500;
+                letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--line);
+                padding:2px 6px;vertical-align:2px;text-decoration:none;opacity:.8;}
   .empty{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
          border:1px dashed rgba(242,241,237,.22);padding:16px 18px;margin:0 0 8px;}
 
@@ -368,13 +374,20 @@
     </section>
     <hr>
     <section>
-      <div class="sec-head"><h2>Active</h2><span class="fill"></span><span class="tag">Tap to edit</span></div>
+      <div class="sec-head"><h2>Learning now</h2><span class="fill"></span><span class="tag">Tap to edit</span></div>
       <div id="activeList"></div>
     </section>
+    <div id="finWrap" hidden>
+    <hr>
+    <section>
+      <div class="sec-head"><h2>Finished the course</h2><span class="fill"></span><span class="tag">On the books</span></div>
+      <div id="finList"></div>
+    </section>
+    </div>
     <div id="offWrap" hidden>
     <hr>
     <section>
-      <div class="sec-head"><h2>Finished</h2><span class="fill"></span><span class="tag">Switched off</span></div>
+      <div class="sec-head"><h2>Switched off</h2><span class="fill"></span><span class="tag">Not in the room</span></div>
       <div id="offList"></div>
     </section>
     </div>
@@ -447,11 +460,13 @@
           <button type="button" data-v="Production" aria-pressed="false">Production</button>
           <button type="button" data-v="Vocals" aria-pressed="false">Vocals &middot; online</button>
         </div></div>
-      <div class="field" id="kindWrap"><label>Student</label>
-        <div class="seg" id="s-kind">
-          <button type="button" data-v="new" aria-pressed="true">New</button>
-          <button type="button" data-v="old" aria-pressed="false">Already learning</button>
-        </div></div>
+      <div class="field" id="kindWrap"><label>Where they are</label>
+        <div class="seg seg3" id="s-kind">
+          <button type="button" data-v="new" aria-pressed="true">Starting</button>
+          <button type="button" data-v="old" aria-pressed="false">Learning</button>
+          <button type="button" data-v="done" aria-pressed="false">Finished</button>
+        </div>
+        <p class="sum" id="kindNote" style="margin-top:8px;"></p></div>
 
       <div class="grp">
         <p class="gk">Their plan</p>
@@ -473,11 +488,11 @@
       </div>
 
       <div class="grp" id="leftWrap" hidden>
-        <p class="gk">What they have left</p>
-        <div class="pair">
-          <div class="field"><label for="s-cleft">Classes left</label>
+        <p class="gk" id="leftGk">What they have left</p>
+        <div class="pair" id="leftPair">
+          <div class="field" id="cleftField"><label for="s-cleft">Classes left</label>
             <input id="s-cleft" type="number" inputmode="numeric" min="0" value="12"></div>
-          <div class="field"><label for="s-pleft">Practice left</label>
+          <div class="field"><label for="s-pleft">Practice &amp; revision left</label>
             <input id="s-pleft" type="number" inputmode="numeric" min="0" value="8"></div>
         </div>
         <p class="sum" id="leftSum"></p>
@@ -492,7 +507,7 @@
     <div id="sExtra" hidden style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px;">
       <button class="quiet" id="sWelcome" type="button">Send their welcome again &rarr;</button>
       <button class="quiet" id="sNewCode" type="button">Give them a new code &rarr;</button>
-      <button class="quiet warn" id="sToggle" type="button">Switch off &mdash; course finished</button>
+      <button class="quiet warn" id="sToggle" type="button">Switch off &mdash; take them out of The Room</button>
     </div>
 
     <div id="done" hidden style="display:flex;flex-direction:column;gap:14px;">
@@ -517,9 +532,11 @@
 
   // ---------------------------------------------------------------- demo
   var demo = [
-    { row: 2, name: "Aniket Chhetri", phone: "9967579048", code: "K7MR4X", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 4, done: 4, upcoming: 1, active: true },
-    { row: 3, name: "Meher Kapoor", phone: "9811111111", code: "M3HQ8Z", course: "Production", total: 24, taught: 24, practice: 0, perWeek: 2, doneBefore: 9, done: 11, upcoming: 2, active: true },
-    { row: 4, name: "Old Student", phone: "9810876610", code: "P2WD7N", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 20, done: 20, upcoming: 0, active: false }
+    { row: 2, name: "Aniket Chhetri", phone: "9967579048", code: "K7MR4X", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 4, done: 4, upcoming: 1, active: true, stage: "running" },
+    { row: 3, name: "Meher Kapoor", phone: "9811111111", code: "M3HQ8Z", course: "Production", total: 24, taught: 24, practice: 0, perWeek: 2, doneBefore: 9, done: 11, upcoming: 2, active: true, stage: "running" },
+    { row: 5, name: "Ishaan Rao", phone: "9810000001", code: "T4KQ2V", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 15, done: 15, upcoming: 1, active: true, stage: "finished" },
+    { row: 6, name: "Tara Menon", phone: "9810000002", code: "B8NF5C", course: "Production", total: 24, taught: 24, practice: 0, perWeek: 2, doneBefore: 24, done: 24, upcoming: 0, active: true, stage: "finished" },
+    { row: 4, name: "Old Student", phone: "9810876610", code: "P2WD7N", course: "DJ", total: 20, taught: 12, practice: 8, perWeek: 2, doneBefore: 20, done: 20, upcoming: 0, active: false, stage: "running" }
   ];
   function wait(v) { return new Promise(function (r) { setTimeout(function () { r(v); }, 300); }); }
   function demoCode() { var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", c = ""; for (var i = 0; i < 6; i++) c += a[Math.floor(Math.random() * a.length)]; return c; }
@@ -554,6 +571,7 @@
         if (!x) { x = { row: demo.length + 2, code: demoCode(), upcoming: 0 }; demo.push(x); }
         x.name = s.name; x.phone = digits; x.course = s.course; x.taught = +s.classes; x.practice = +s.practice || 0; x.total = x.taught + x.practice; x.perWeek = +s.perWeek;
         var viaRoom = (x.done || 0) - (x.doneBefore || 0); x.doneBefore = +s.doneBefore || 0; x.done = x.doneBefore + Math.max(0, viaRoom); x.active = s.active !== false;
+        x.stage = s.stage === "finished" ? "finished" : "running";
         return wait({ ok: true, student: JSON.parse(JSON.stringify(x)) });
       }
       if (p.type === "admin_newcode") { var y = demo.filter(function (d) { return d.row === p.row; })[0]; y.code = demoCode(); return wait({ ok: true, code: y.code }); }
@@ -594,28 +612,45 @@
   }
   function line(s) {
     var l = left(s), prog;
+    if (fin(s)) {
+      var fl = left(s);
+      return [s.course, "course done",
+              fl.practice ? fl.practice + " practice left" : "nothing left",
+              s.upcoming ? s.upcoming + " booked" : ""].filter(Boolean).join(" \u00b7 ");
+    }
     if (!s.total) prog = "";
     else if (!l.classes && !l.practice) prog = "course complete";
     else if (!l.classes) prog = "practice \u00b7 " + l.practice + " left";
     else prog = l.classes + (l.classes === 1 ? " class" : " classes") + " left" + (l.practice ? " + " + l.practice + " practice" : "");
     return [s.course, prog, s.upcoming ? s.upcoming + " booked" : ""].filter(Boolean).join(" · ");
   }
+  function fin(s) { return s.stage === "finished"; }
   function row(s) {
-    var b = document.createElement("button"); b.type = "button"; b.className = "person" + (s.active ? "" : " off");
-    b.innerHTML = "<div><b>" + esc(s.name) + "</b><span>" + esc(line(s)) + "</span></div><i>" + esc(s.code) + "</i>";
+    var b = document.createElement("button"); b.type = "button";
+    b.className = "person" + (s.active ? "" : " off") + (fin(s) ? " fin" : "");
+    b.innerHTML = "<div><b>" + esc(s.name) + (fin(s) ? '<span class="chip">Done</span>' : "") +
+                  "</b><span>" + esc(line(s)) + "</span></div><i>" + esc(s.code) + "</i>";
     b.addEventListener("click", function () { edit(s); });
     return b;
   }
   function draw() {
-    var on = S.list.filter(function (s) { return s.active; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
-    var off = S.list.filter(function (s) { return !s.active; }).sort(function (a, b) { return a.name.localeCompare(b.name); });
-    $("count").textContent = on.length + " active" + (off.length ? " · " + off.length + " finished" : "");
-    var A = $("activeList"); A.innerHTML = "";
-    if (!on.length) A.innerHTML = '<p class="empty">No active students yet</p>';
-    else { var g = document.createElement("div"); g.className = "people"; on.forEach(function (s) { g.appendChild(row(s)); }); A.appendChild(g); }
-    $("offWrap").hidden = !off.length;
-    var F = $("offList"); F.innerHTML = "";
-    if (off.length) { var h = document.createElement("div"); h.className = "people"; off.forEach(function (s) { h.appendChild(row(s)); }); F.appendChild(h); }
+    var by = function (a, b) { return a.name.localeCompare(b.name); };
+    var on  = S.list.filter(function (s) { return s.active && !fin(s); }).sort(by);
+    var fn  = S.list.filter(function (s) { return s.active && fin(s); }).sort(by);
+    var off = S.list.filter(function (s) { return !s.active; }).sort(by);
+    $("count").textContent = [on.length + " learning",
+                              fn.length ? fn.length + " finished" : "",
+                              off.length ? off.length + " off" : ""].filter(Boolean).join(" \u00b7 ");
+    function fill(id, list, empty) {
+      var box = $(id); box.innerHTML = "";
+      if (!list.length) { if (empty) box.innerHTML = '<p class="empty">' + empty + '</p>'; return; }
+      var g = document.createElement("div"); g.className = "people";
+      list.forEach(function (s) { g.appendChild(row(s)); });
+      box.appendChild(g);
+    }
+    fill("activeList", on, "No students learning yet");
+    $("finWrap").hidden = !fn.length; fill("finList", fn);
+    $("offWrap").hidden = !off.length; fill("offList", off);
   }
 
   // ---------------------------------------------------------------- form
@@ -631,7 +666,16 @@
   function setKind(v) {
     S.kind = v;
     document.querySelectorAll("#s-kind button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-v") === v ? "true" : "false"); });
-    $("leftWrap").hidden = v !== "old";
+    // Starting: the whole plan is ahead of them. Learning: you type what's left.
+    // Finished: nothing is left, and their code stops booking.
+    var done = v === "done";
+    $("leftWrap").hidden = v === "new";
+    $("cleftField").hidden = done;
+    $("leftPair").style.gridTemplateColumns = done ? "1fr" : "";
+    if (done) $("s-cleft").value = 0;
+    $("kindNote").textContent = done
+      ? "Classes all done. Put in the practice & revision sessions they still have \u2014 those are what they book."
+      : v === "new" ? "The whole plan is ahead of them." : "Type what they still have left below.";
     sums();
   }
   function fillPlan(d) {
@@ -644,8 +688,8 @@
     var weeks = Math.ceil((c + p) / w);
     $("planSum").innerHTML = "<b>" + (c + p) + " sessions</b> \u00b7 " + c + " classes" + (p ? " + " + p + " practice" : "") +
       " \u00b7 about " + weeks + (weeks === 1 ? " week" : " weeks") + " at " + w + " a week";
-    if (S.kind === "old") {
-      var cl = num("s-cleft"), pl = num("s-pleft"), booked = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
+    if (S.kind !== "new") {
+      var cl = S.kind === "done" ? 0 : num("s-cleft"), pl = num("s-pleft");
       var ahead = S.cur ? S.cur.upcoming || 0 : 0;
       $("leftSum").innerHTML = "<b>" + (cl + pl) + " left</b> of " + (c + p) + " \u00b7 " + ((c + p) - (cl + pl)) + " done" +
         (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
@@ -676,17 +720,18 @@
   $("addBtn").addEventListener("click", function () {
     S.cur = null; $("pKick").textContent = "New student"; $("pTitle").textContent = "Add a student";
     $("s-name").value = ""; $("s-phone").value = ""; setCourse("DJ");
-    $("kindWrap").hidden = false; fillPlan(DEFAULTS.DJ); setKind("new"); drawChips(""); $("sSave").textContent = "Add";
+    fillPlan(DEFAULTS.DJ); setKind("new"); drawChips(""); $("sSave").textContent = "Add";
     open("add");
   });
   function edit(s) {
-    S.cur = s; $("pKick").textContent = s.code + (s.active ? "" : " · switched off"); $("pTitle").textContent = s.name;
+    S.cur = s; $("pKick").textContent = s.code + (s.active ? (s.stage === "finished" ? " · finished" : "") : " · switched off");
+    $("pTitle").textContent = s.name;
     $("s-name").value = s.name; $("s-phone").value = s.phone; setCourse(s.course === "Production" || s.course === "Vocals" ? s.course : "DJ");
     var taught = s.taught == null ? s.total : s.taught, l = left(s);
     $("s-classes").value = taught; $("s-practice").value = s.practice || 0; $("s-week").value = s.perWeek;
     $("s-cleft").value = l.classes; $("s-pleft").value = l.practice;
-    $("kindWrap").hidden = true; setKind("old"); drawChips(s.mentors); $("sSave").textContent = "Save";
-    $("sToggle").textContent = s.active ? "Switch off — course finished" : "Switch back on";
+    setKind(s.stage === "finished" ? "done" : "old"); drawChips(s.mentors); $("sSave").textContent = "Save";
+    $("sToggle").textContent = s.active ? "Switch off — take them out of The Room" : "Switch back on";
     open("edit");
   }
   $("sCancel").addEventListener("click", close);
@@ -695,11 +740,14 @@
 
   function payload(activeOverride) {
     var c = num("s-classes"), p = num("s-practice");
-    var cl = S.kind === "old" ? num("s-cleft") : c, pl = S.kind === "old" ? num("s-pleft") : p;
+    var done = S.kind === "done";
+    var cl = done ? 0 : S.kind === "old" ? num("s-cleft") : c;
+    var pl = S.kind === "new" ? p : num("s-pleft");
     // "Done before" is whatever isn't left and wasn't booked through The Room.
     var viaRoom = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
     var s = { name: $("s-name").value.trim(), phone: $("s-phone").value.trim(), course: S.course,
               classes: c, practice: p, perWeek: $("s-week").value, mentors: chosenMentors(),
+              stage: done ? "finished" : "running",
               doneBefore: Math.max(0, (c - cl) + (p - pl) - viaRoom) };
     if (S.cur) { s.row = S.cur.row; s.active = activeOverride === undefined ? S.cur.active : activeOverride; }
     return s;
@@ -716,9 +764,10 @@
     if (c < 1) { say("Add how many classes are in their plan."); return; }
     if (S.kind === "old") {
       if (cl < 0 || cl > c) { say("Classes left can be 0 to " + c + "."); return; }
-      if (pl < 0 || pl > p) { say("Practice left can be 0 to " + p + "."); return; }
+      if (pl < 0 || pl > p) { say("Practice & revision left can be 0 to " + p + "."); return; }
       if (cl > 0 && pl < p) { say("Practice comes after the classes. If they've started practice, classes left is 0."); return; }
     }
+    if (S.kind === "done" && (pl < 0 || pl > p)) { say("Practice & revision left can be 0 to " + p + "."); return; }
     btn.disabled = true;
     admin("admin_save", { student: payload() }).then(function (r) {
       btn.disabled = false;
