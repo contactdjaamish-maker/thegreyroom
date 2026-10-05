@@ -466,9 +466,10 @@
           <button type="button" data-v="old" aria-pressed="false">Learning</button>
           <button type="button" data-v="done" aria-pressed="false">Finished</button>
         </div>
-        <p class="sum" id="kindNote" style="margin-top:8px;"></p></div>
+        <p class="sum" id="kindNote" style="margin-top:8px;"></p>
+        <button class="quiet" id="planToggle" type="button" style="margin-top:4px;">Their plan is the course default &mdash; change it &rarr;</button></div>
 
-      <div class="grp">
+      <div class="grp" id="planWrap" hidden>
         <p class="gk">Their plan</p>
         <div class="three">
           <div class="field"><label for="s-classes">Classes</label>
@@ -492,7 +493,7 @@
         <div class="pair" id="leftPair">
           <div class="field" id="cleftField"><label for="s-cleft">Classes left</label>
             <input id="s-cleft" type="number" inputmode="numeric" min="0" value="12"></div>
-          <div class="field"><label for="s-pleft">Practice &amp; revision left</label>
+          <div class="field"><label for="s-pleft" id="pleftLabel">Practice &amp; revision left</label>
             <input id="s-pleft" type="number" inputmode="numeric" min="0" value="8"></div>
         </div>
         <p class="sum" id="leftSum"></p>
@@ -669,12 +670,30 @@
     // Starting: the whole plan is ahead of them. Learning: you type what's left.
     // Finished: nothing is left, and their code stops booking.
     var done = v === "done";
+    // Finished means the course is over. The only number left to decide is how
+    // many practice & revision sessions they get, so every other box goes away -
+    // the plan is filled in behind the scenes from the course default.
+    // The plan comes from the course - DJ is 12 classes + 8 practice, Production
+    // is 24 - so there is nothing to type unless you deliberately open it up.
+    $("planWrap").hidden = !S.showPlan || done;
+    $("planToggle").hidden = done;
+    $("planToggle").textContent = S.showPlan
+      ? "Use the course default instead \u2190"
+      : "Their plan is the course default \u2014 change it \u2192";
     $("leftWrap").hidden = v === "new";
     $("cleftField").hidden = done;
     $("leftPair").style.gridTemplateColumns = done ? "1fr" : "";
-    if (done) $("s-cleft").value = 0;
+    $("leftGk").textContent = done ? "Practice & revision" : "What they have left";
+    $("pleftLabel").textContent = done ? "How many sessions" : "Practice & revision left";
+    if (done) {
+      $("s-cleft").value = 0;
+      var d = DEFAULTS[S.course] || DEFAULTS.DJ;
+      $("s-classes").value = d.classes; $("s-week").value = d.week;
+      if (!S.cur) $("s-pleft").value = d.practice || 8;
+      $("s-practice").value = Math.max(num("s-pleft"), 0);
+    }
     $("kindNote").textContent = done
-      ? "Classes all done. Put in the practice & revision sessions they still have \u2014 those are what they book."
+      ? "Course already done. The only thing to set is how many practice & revision sessions they get."
       : v === "new" ? "The whole plan is ahead of them." : "Type what they still have left below.";
     sums();
   }
@@ -691,21 +710,39 @@
     if (S.kind !== "new") {
       var cl = S.kind === "done" ? 0 : num("s-cleft"), pl = num("s-pleft");
       var ahead = S.cur ? S.cur.upcoming || 0 : 0;
-      $("leftSum").innerHTML = "<b>" + (cl + pl) + " left</b> of " + (c + p) + " \u00b7 " + ((c + p) - (cl + pl)) + " done" +
-        (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
+      if (S.kind === "done") {
+        $("leftSum").innerHTML = "<b>" + pl + (pl === 1 ? " session" : " sessions") + "</b> to book \u00b7 course already finished" +
+          (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
+      } else {
+        $("leftSum").innerHTML = "<b>" + (cl + pl) + " left</b> of " + (c + p) + " \u00b7 " + ((c + p) - (cl + pl)) + " done" +
+          (ahead ? " \u00b7 " + ahead + " already booked ahead" : "");
+      }
     }
   }
   // "Left" can't be more than the plan - so if you type more left than the plan has, the plan grows to match.
   $("s-cleft").addEventListener("input", function () { if (num("s-cleft") > num("s-classes")) $("s-classes").value = num("s-cleft"); });
-  $("s-pleft").addEventListener("input", function () { if (num("s-pleft") > num("s-practice")) $("s-practice").value = num("s-pleft"); });
+  $("s-pleft").addEventListener("input", function () {
+    if (S.kind === "done") { $("s-practice").value = Math.max(0, num("s-pleft")); return; }
+    if (num("s-pleft") > num("s-practice")) $("s-practice").value = num("s-pleft");
+  });
   ["s-classes", "s-practice", "s-week", "s-cleft", "s-pleft"].forEach(function (id) { $(id).addEventListener("input", sums); });
   // Changing the plan of someone new keeps "left" equal to the whole plan.
   ["s-classes", "s-practice"].forEach(function (id) { $(id).addEventListener("input", function () {
     if (!S.cur && S.kind !== "old") { $("s-cleft").value = $("s-classes").value; $("s-pleft").value = $("s-practice").value; }
   }); });
   document.querySelectorAll("#s-kind button").forEach(function (b) { b.addEventListener("click", function () { setKind(b.getAttribute("data-v")); $("sMsg").hidden = true; }); });
+  $("planToggle").addEventListener("click", function () {
+    S.showPlan = !S.showPlan;
+    if (!S.showPlan && DEFAULTS[S.course]) {   // back to the course's own numbers
+      var d = DEFAULTS[S.course];
+      $("s-classes").value = d.classes; $("s-practice").value = d.practice; $("s-week").value = d.week;
+      if (S.kind === "new") { $("s-cleft").value = d.classes; $("s-pleft").value = d.practice; }
+    }
+    setKind(S.kind); $("sMsg").hidden = true;
+  });
   document.querySelectorAll("#s-course button").forEach(function (b) { b.addEventListener("click", function () {
     var v = b.getAttribute("data-v"); setCourse(v);
+    if (S.kind === "done") { setKind("done"); return; }
     if (!S.cur && DEFAULTS[v]) fillPlan(DEFAULTS[v]);
   }); });
 
@@ -720,7 +757,7 @@
   $("addBtn").addEventListener("click", function () {
     S.cur = null; $("pKick").textContent = "New student"; $("pTitle").textContent = "Add a student";
     $("s-name").value = ""; $("s-phone").value = ""; setCourse("DJ");
-    fillPlan(DEFAULTS.DJ); setKind("new"); drawChips(""); $("sSave").textContent = "Add";
+    S.showPlan = false; fillPlan(DEFAULTS.DJ); setKind("new"); drawChips(""); $("sSave").textContent = "Add";
     open("add");
   });
   function edit(s) {
@@ -730,7 +767,7 @@
     var taught = s.taught == null ? s.total : s.taught, l = left(s);
     $("s-classes").value = taught; $("s-practice").value = s.practice || 0; $("s-week").value = s.perWeek;
     $("s-cleft").value = l.classes; $("s-pleft").value = l.practice;
-    setKind(s.stage === "finished" ? "done" : "old"); drawChips(s.mentors); $("sSave").textContent = "Save";
+    S.showPlan = false; setKind(s.stage === "finished" ? "done" : "old"); drawChips(s.mentors); $("sSave").textContent = "Save";
     $("sToggle").textContent = s.active ? "Switch off — take them out of The Room" : "Switch back on";
     open("edit");
   }
@@ -741,8 +778,9 @@
   function payload(activeOverride) {
     var c = num("s-classes"), p = num("s-practice");
     var done = S.kind === "done";
+    if (done) { var dd = DEFAULTS[S.course] || DEFAULTS.DJ; c = dd.classes; p = Math.max(0, num("s-pleft")); }
     var cl = done ? 0 : S.kind === "old" ? num("s-cleft") : c;
-    var pl = S.kind === "new" ? p : num("s-pleft");
+    var pl = done ? p : S.kind === "new" ? p : num("s-pleft");
     // "Done before" is whatever isn't left and wasn't booked through The Room.
     var viaRoom = S.cur ? Math.max(0, (S.cur.done || 0) - (S.cur.doneBefore || 0)) : 0;
     var s = { name: $("s-name").value.trim(), phone: $("s-phone").value.trim(), course: S.course,
@@ -767,7 +805,10 @@
       if (pl < 0 || pl > p) { say("Practice & revision left can be 0 to " + p + "."); return; }
       if (cl > 0 && pl < p) { say("Practice comes after the classes. If they've started practice, classes left is 0."); return; }
     }
-    if (S.kind === "done" && (pl < 0 || pl > p)) { say("Practice & revision left can be 0 to " + p + "."); return; }
+    if (S.kind === "done") {
+      var dpl = num("s-pleft");
+      if (dpl < 0 || dpl > 100) { say("Practice & revision sessions can be 0 to 100."); return; }
+    }
     btn.disabled = true;
     admin("admin_save", { student: payload() }).then(function (r) {
       btn.disabled = false;
