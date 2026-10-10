@@ -224,6 +224,19 @@
   .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
   .btabs { grid-template-columns: repeat(2, 1fr); }
   .btabs button { padding: 9px 4px; }
+  /* where we are */
+  .addr{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:-6px 0 18px;
+        font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;line-height:1.7;color:var(--dim);}
+  .addr a{color:var(--ink);white-space:nowrap;}
+  .maplink{color:inherit;text-decoration:underline;text-underline-offset:2px;
+           text-decoration-color:rgba(242,241,237,.35);}
+  .maplink:hover{text-decoration-color:var(--ink);}
+  .where{border:1px solid var(--line);padding:16px 18px;margin:0;}
+  .where b{display:block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+  .where span{display:block;font-size:.97rem;line-height:1.5;opacity:.88;}
+  .where a{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:10px;
+           letter-spacing:.13em;text-transform:uppercase;color:var(--ink);}
   @media print{
     .gridbg{display:none;} body{padding:0;} form,button,.wa-link,.status{display:none;}
     .phase,.spec div,.task{background:#2b2b2d !important;}
@@ -419,7 +432,6 @@
         <div class="chips" id="m-sees">
           <button type="button" data-v="All DJ" aria-pressed="false">All DJ</button>
           <button type="button" data-v="All Production" aria-pressed="false">All Production</button>
-          <button type="button" data-v="All Vocals" aria-pressed="false">All Vocals</button>
           <button type="button" data-v="Everyone" aria-pressed="false">Everyone</button>
         </div>
         <p class="sum">Plus every student you tick them on. Tick none of these for "only their students".</p></div>
@@ -455,10 +467,9 @@
       <div class="field"><label for="s-phone">WhatsApp number</label>
         <input id="s-phone" type="tel" inputmode="tel" autocomplete="off" placeholder="+91"></div>
       <div class="field"><label>Course</label>
-        <div class="seg seg3" id="s-course">
+        <div class="seg" id="s-course">
           <button type="button" data-v="DJ" aria-pressed="true">DJ</button>
           <button type="button" data-v="Production" aria-pressed="false">Production</button>
-          <button type="button" data-v="Vocals" aria-pressed="false">Vocals &middot; online</button>
         </div></div>
       <div class="field" id="kindWrap"><label>Where they are</label>
         <div class="seg seg3" id="s-kind">
@@ -661,8 +672,7 @@
   }
   // Course defaults for a new student. DJ: 12 taught classes + ~8 practice & revision, 2 a week (~45 days).
   // Production: 24 classes, 2 a week (~90 days). Change the boxes for anyone who differs.
-  var DEFAULTS = { DJ: { classes: 12, practice: 8, week: 2 }, Production: { classes: 24, practice: 0, week: 2 },
-                   Vocals: { classes: 12, practice: 0, week: 1 } };   // Vocals: online with Shreya, 3 months, 1 a week
+  var DEFAULTS = { DJ: { classes: 12, practice: 8, week: 2 }, Production: { classes: 24, practice: 0, week: 2 } };
   function num(id) { var v = Math.floor(+$(id).value); return isNaN(v) ? 0 : v; }
   function setKind(v) {
     S.kind = v;
@@ -763,7 +773,7 @@
   function edit(s) {
     S.cur = s; $("pKick").textContent = s.code + (s.active ? (s.stage === "finished" ? " · finished" : "") : " · switched off");
     $("pTitle").textContent = s.name;
-    $("s-name").value = s.name; $("s-phone").value = s.phone; setCourse(s.course === "Production" || s.course === "Vocals" ? s.course : "DJ");
+    $("s-name").value = s.name; $("s-phone").value = s.phone; setCourse(s.course === "Production" ? "Production" : "DJ");
     var taught = s.taught == null ? s.total : s.taught, l = left(s);
     $("s-classes").value = taught; $("s-practice").value = s.practice || 0; $("s-week").value = s.perWeek;
     $("s-cleft").value = l.classes; $("s-pleft").value = l.practice;
@@ -895,7 +905,6 @@
     if (/Everyone/.test(v)) return true;
     if (/All DJ/.test(v) && s.course === "DJ") return true;
     if (/All Production/.test(v) && s.course === "Production") return true;
-    if (/All Vocals/.test(v) && s.course === "Vocals") return true;
     return named(s).indexOf(m.name.toLowerCase()) >= 0;
   }
   function setSees(v) {

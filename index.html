@@ -244,6 +244,16 @@
   /* the first record: mentors. Same invisible door, one record to the left. */
   .door.door-m { left: 21%; width: 25%; }
   .door:focus-visible { outline: 1px solid rgba(242,241,237,.5); outline-offset: 2px; }
+  /* where we are */
+  .maplink { color: inherit; text-decoration: underline; text-underline-offset: 2px;
+             text-decoration-color: rgba(242,241,237,.35); }
+  .maplink:hover { text-decoration-color: var(--ink); }
+  .where { border: 1px solid var(--line); padding: 16px 18px; margin: 0; }
+  .where b { display: block; font-family: var(--mono); font-size: 9.5px; font-weight: 500;
+             letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; }
+  .where span { display: block; font-size: .97rem; line-height: 1.5; opacity: .88; }
+  .where a { display: inline-block; margin-top: 9px; font-family: var(--mono); font-size: 10px;
+             letter-spacing: .13em; text-transform: uppercase; color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -275,7 +285,7 @@
       <a class="bar" id="link-mc" href="#" target="_blank" rel="noopener">
         <span>
           <span class="label">Masterclass</span>
-          <span class="note">9 oct &middot; 3pm &middot; rsvp</span>
+          <span class="note">date to be announced &middot; rsvp to hear first</span>
         </span>
         <span class="arrow" aria-hidden="true">&rarr;</span>
       </a>
@@ -319,7 +329,7 @@
   <hr class="rule">
 
   <section>
-    <div class="sec-head"><h2>The courses</h2><span class="fill"></span><span class="eyebrow">03 &middot; one-to-one</span></div>
+    <div class="sec-head"><h2>The courses</h2><span class="fill"></span><span class="eyebrow">02 &middot; one-to-one</span></div>
     <div class="links">
 
       <a class="bar" id="link-dj" href="#" target="_blank" rel="noopener">
@@ -333,13 +343,6 @@
         <span>
           <span class="label">Music Production</span>
           <span class="note">3 months &middot; one-to-one &middot; read the syllabus</span>
-        </span>
-        <span class="arrow" aria-hidden="true">&rarr;</span>
-      </a>
-      <a class="bar" id="link-vocals" href="#" target="_blank" rel="noopener">
-        <span>
-          <span class="label">How to sing vocals on EMP</span>
-          <span class="note">3 months &middot; online &middot; with Shreya Bajpai</span>
         </span>
         <span class="arrow" aria-hidden="true">&rarr;</span>
       </a>
@@ -381,7 +384,6 @@
           <select id="f-course" name="course">
             <option>DJ &mdash; basics to advanced</option>
             <option>Music production &mdash; 3 months</option>
-            <option>Vocals on electronic music &mdash; 3 months, online</option>
             <option>More than one of these</option>
             <option>Not sure yet</option>
           </select>
@@ -404,8 +406,7 @@
         <div class="tslots" id="tslots"></div>
         <p class="tnote" id="tnote">Longer-range times go to our students first.</p>
       </div>
-      <p class="tnote" id="vnote" hidden>Vocals trials are online with Shreya Bajpai &mdash;
-        send this and we&rsquo;ll fix a time with you on WhatsApp.</p>
+      <p class="tnote" id="vnote" hidden></p>
 
       <button type="submit" id="submit">Send on WhatsApp</button>
       <p class="fine" id="hint">Opens WhatsApp with your details filled in. Nothing is posted publicly.</p>
@@ -418,8 +419,16 @@
 
   <hr class="rule">
 
+  <section>
+    <p class="where"><b>Where to find us</b><span>G-052, Raheja Vedaanta Tower GHI, Sector 108, Dharampur, near Dwarka Expressway, Gurugram, Haryana</span>
+      <a href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Open in Maps &rarr;</a></p>
+  </section>
+
+  <hr class="rule">
+
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
+    <span class="fine">The Grey Room &middot;
+      <a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a> &middot; Noida</span>
     <span class="colo">
       <a class="fine ig" href="archive.html">Archive 01</a>
       <span class="fine" aria-hidden="true">&middot;</span>
@@ -442,7 +451,6 @@
   //    links work both before and after you upload. Nothing to change.
   var DJ_BROCHURE    = "brochure-dj.html";
   var PROD_BROCHURE  = "brochure-production.html";
-  var TOP_BROCHURE   = "brochure-toplining.html";
 
   // 4. Where enquiries get recorded. Paste the Google Apps Script web-app
   //    URL here and every submission is written to your sheet as a row.
@@ -480,7 +488,6 @@
     local("link-mc", "masterclass.html");
     local("link-dj", DJ_BROCHURE);
     local("link-prod", PROD_BROCHURE);
-    local("link-vocals", TOP_BROCHURE);
   })();
 
   // ---- "Where you're at" follows the course they picked -------------------
@@ -491,8 +498,6 @@
     ["Never touched a deck", "Bedroom, self-taught", "Played a few gigs", "Playing regularly"],
     // Music production
     ["Never opened a DAW", "Made a few loops", "Finishing tracks already", "Released something"],
-    // Vocals on electronic music
-    ["I sing, but never to a track", "I write songs", "I produce and want to write my own vocals", "Starting from scratch"],
     // More than one of these
     ["Complete beginner", "Self-taught so far", "Some experience", "Doing this already"],
     // Not sure yet

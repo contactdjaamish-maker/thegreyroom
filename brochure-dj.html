@@ -224,6 +224,19 @@
   .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
   .btabs { grid-template-columns: repeat(2, 1fr); }
   .btabs button { padding: 9px 4px; }
+  /* where we are */
+  .addr{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:-6px 0 18px;
+        font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;line-height:1.7;color:var(--dim);}
+  .addr a{color:var(--ink);white-space:nowrap;}
+  .maplink{color:inherit;text-decoration:underline;text-underline-offset:2px;
+           text-decoration-color:rgba(242,241,237,.35);}
+  .maplink:hover{text-decoration-color:var(--ink);}
+  .where{border:1px solid var(--line);padding:16px 18px;margin:0;}
+  .where b{display:block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+  .where span{display:block;font-size:.97rem;line-height:1.5;opacity:.88;}
+  .where a{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:10px;
+           letter-spacing:.13em;text-transform:uppercase;color:var(--ink);}
   @media print{
     .gridbg{display:none;} body{padding:0;} form,button,.wa-link,.status{display:none;}
     .phase,.spec div,.task{background:#2b2b2d !important;}
@@ -245,7 +258,7 @@
       <h1>Inside the mind of a DJ.</h1>
     </div>
     <p class="stand">Six weeks, one-to-one, on club-standard gear. You leave with a recorded one-hour set and an actual answer to why you play what you play.</p>
-    <div class="spec"><div><b>Duration</b><span>6 weeks</span></div><div><b>Format</b><span>One-to-one</span></div><div><b>Gear</b><span>XDJ RX3 &middot; CDJ / DJM</span></div><div><b>Where</b><span>Gurugram &middot; Noida</span></div></div>
+    <div class="spec"><div><b>Duration</b><span>6 weeks</span></div><div><b>Format</b><span>One-to-one</span></div><div><b>Gear</b><span>XDJ RX3 &middot; CDJ / DJM</span></div><div><b>Where</b><span><a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a> &middot; Noida</span></div></div>
   </div>
   </div>
 
@@ -308,7 +321,7 @@
   </div>
 
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
+    <span class="fine">The Grey Room &middot; <a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a> &middot; Noida</span>
     <span class="colo">
       <a class="fine igf" href="archive.html">Archive 01</a>
       <span class="fine" aria-hidden="true">&middot;</span>
@@ -345,10 +358,27 @@
     function live() { return ROOM_ENDPOINT && ROOM_ENDPOINT.indexOf("__") !== 0; }
     function hr(h) { return (h % 12 || 12) + " " + (h >= 12 ? "PM" : "AM"); }
     function vocals() { return /vocal|topl/i.test(COURSE); }
-    function when(s) { var d = new Date(s.date + "T00:00"); return L[d.getDay()] + " " + d.getDate() + " " + M[d.getMonth()] + ", " + hr(s.hour) + (s.at ? ", " + s.at : ""); }
+    function when(s) { var d = new Date(s.date + "T00:00"); return L[d.getDay()] + " " + d.getDate() + " " + M[d.getMonth()] + ", " + hr(s.hour) + " – " + hr(s.hour + 1) + (s.at ? ", " + s.at : ""); }
+
+  // Google sometimes sits on a reply or hands back an error page instead of an
+  // answer. Reads give up after a few seconds and quietly ask again; writes
+  // (a booking, a save) are sent once and never repeated, so nothing doubles.
+  function send(url, obj) {
+    var READS = { portal_open: 1, portal_login: 1, portal_week: 1, trial_slots: 1, admin_students: 1, admin_login: 1 };
+    var read = !!READS[obj.type], tries = read ? 3 : 1, limit = [12000, 15000, 20000];
+    function go(i) {
+      var ctl = window.AbortController ? new AbortController() : null;
+      var t = ctl ? setTimeout(function () { ctl.abort(); }, read ? limit[i] : 45000) : null;
+      return fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+                          body: JSON.stringify(obj), signal: ctl ? ctl.signal : undefined })
+        .then(function (r) { return r.text(); })
+        .then(function (x) { if (t) clearTimeout(t); return JSON.parse(x); })
+        .catch(function (e) { if (t) clearTimeout(t); if (i + 1 < tries) return go(i + 1); throw e; });
+    }
+    return go(0);
+  }
     function post(o) {
-      return fetch(ROOM_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-                                    body: JSON.stringify(o) }).then(function (r) { return r.json(); });
+      return send(ROOM_ENDPOINT, o);
     }
     function sync() {
       var use = on && !vocals();
@@ -431,7 +461,8 @@
         if (c && Date.now() - c.t < 10 * 60 * 1000) take(c.r);
       } catch (e) {}
       if (!on) { waiting = true; $("tslots").innerHTML = '<p class="tnote" style="grid-column:1/-1">Finding times…</p>'; sync(); }
-      var ask = (!again && window.GR_SLOTS) || post({ type: "trial_slots" });
+      var ask = (!again && window.GR_SLOTS) ? window.GR_SLOTS.catch(function () { return post({ type: "trial_slots" }); })
+                                            : post({ type: "trial_slots" });
       window.GR_SLOTS = null;
       ask.then(function (r) {
         waiting = false;

@@ -224,6 +224,19 @@
   .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
   .btabs { grid-template-columns: repeat(2, 1fr); }
   .btabs button { padding: 9px 4px; }
+  /* where we are */
+  .addr{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:-6px 0 18px;
+        font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;line-height:1.7;color:var(--dim);}
+  .addr a{color:var(--ink);white-space:nowrap;}
+  .maplink{color:inherit;text-decoration:underline;text-underline-offset:2px;
+           text-decoration-color:rgba(242,241,237,.35);}
+  .maplink:hover{text-decoration-color:var(--ink);}
+  .where{border:1px solid var(--line);padding:16px 18px;margin:0;}
+  .where b{display:block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+  .where span{display:block;font-size:.97rem;line-height:1.5;opacity:.88;}
+  .where a{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:10px;
+           letter-spacing:.13em;text-transform:uppercase;color:var(--ink);}
   @media print{
     .gridbg{display:none;} body{padding:0;} form,button,.wa-link,.status{display:none;}
     .phase,.spec div,.task{background:#2b2b2d !important;}
@@ -308,7 +321,7 @@
     <p class="stand">Three different things, not three names for one thing. One is
       taught, one is a night on the decks, one is a day of making. All of them
       at The Grey Room.</p>
-    <div class="spec"><div><b>Masterclass</b><span>Next &middot; 9 Oct</span></div><div><b>Open Decks</b><span>Date to come</span></div><div><b>Open Collab Days</b><span>Date to come</span></div><div><b>Where</b><span>Gurugram</span></div></div>
+    <div class="spec"><div><b>Masterclass</b><span>Date to come</span></div><div><b>Open Decks</b><span>Date to come</span></div><div><b>Open Collab Days</b><span>Date to come</span></div><div><b>Where</b><span><a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a></span></div></div>
   </div>
   </div>
 
@@ -326,34 +339,26 @@
     </p>
 
     
-    <div class="mc">
-      <img class="poster" src="masterclass-9-oct.jpg" width="1000" height="1250" loading="lazy" decoding="async" alt="The Only Woman in the Room &mdash; masterclass by Shreya Bajpai at The Grey Room">
-      <div class="mc-top">
-        <span class="mc-when">Next &middot; Friday 9 October</span>
-        <h3>The Only Woman in the Room</h3>
-        <p class="mc-with">With Shreya Bajpai &mdash; singer, and the voice on the records</p>
-      </div>
-      <div class="mc-body">
-        <div class="mc-facts"><div><b>Date</b><span>Friday 9 Oct 2026</span></div><div><b>Time</b><span>3PM onwards</span></div><div><b>Where</b><span>The Grey Room &middot; Gurugram</span></div><div><b>Entry</b><span>RSVP &middot; limited seats</span></div></div>
-        <p class="addr"><span>G-052, Raheja Vedaanta Tower GHI, Sector 108, Dharampur, near Dwarka Expressway, Gurugram, Haryana</span><a href="https://maps.app.goo.gl/gf2LKodAXt8Tk9MK7" target="_blank" rel="noopener">Open in Maps &rarr;</a></p>
-        <p>Shreya Bajpai has spent her working life as the only woman in a lot of rooms &mdash; studios, green rooms, vans at four in the morning. She is taking the afternoon on what it actually takes to build and keep a career in music in India, and on what nobody says out loud about doing it as a woman.</p><p>It runs in two halves. She sings first &mdash; you watch the decisions get made, not just hear the result. Then the hard part: safety, money, credit, and the people you keep around you.</p><p>Open to everyone, not women-only. Most of what goes wrong for women in this industry happens in rooms full of men, so those are the rooms that need to hear it.</p>
-        <div class="covers"><div class="week"><span class="no">01</span><div><h4>She sings</h4><p class="lead">The craft half &mdash; the decisions a singer never gets to watch anyone else make.</p><ul><li>One line, three deliveries, and why she would pick one</li><li>A song from voice note to demo to release</li><li>In the room with a producer &mdash; how she asks for what she wants</li><li>The voices that made her, and what she took from each</li></ul></div></div><div class="week"><span class="no">02</span><div><h4>Then she tells you the truth</h4><p class="lead">Women, music, survival &mdash; what it actually takes to keep going.</p><ul><li>Being the only woman in the studio</li><li>Being taken seriously on the technical side</li><li>Getting credited, getting paid</li><li>Safety, travel and saying no</li><li>Who to keep around you</li></ul></div></div></div>
-        <p class="after">Open conversation and Q&amp;A to close, and a question box at
-        the door &mdash; write yours on a slip, no names, and it gets read out. Bring the
-        ones you would not ask in a comment section. Staying on afterwards: a special
-        live set by Shreya with <b>Jay Rana</b> on guitar, with Manch and Afterglow.</p>
+    <div class="also">
+      <div class="also-body">
+        <span class="also-when">Date to be announced</span>
+        <p>The next one is being booked &mdash; artist and date get announced
+        together, and seats go in the order people ask.</p>
+        <p class="also-tag">Free &middot; limited seats</p>
+        <button type="button" class="also-btn" data-event="Masterclass">
+          Tell me when</button>
       </div>
     </div>
 
     <p class="stand" style="margin:0;font-size:.95rem;">
       Seats are limited by the size of the room, not by a sales tactic. RSVP below
-      and we will message you on WhatsApp to confirm your place and send the address.
+      and we will message you on WhatsApp the moment the next date is set.
     </p>
 
     <div class="sec-head" style="margin-top:40px;"><h2>Already happened</h2>
       <span class="fill"></span>
       <span class="tag">So far</span></div>
-    <div class="past"><div><b>Open Decks &mdash; Afterglow &times; The Den</b><span>Major Minor, ELCOR b2b ANKTT, YXS, JAAXDIP, Nihaarika + The Late Shift &middot; 27 September 2026</span></div><div><b>Surviving the Industry</b><span>Major Minor &mdash; Chitralekha Sen &amp; Mukul Bhatt &middot; 27 September 2026</span></div><div><b>Mixing Without Overthinking</b><span>Rudransh Thakur &middot; 8 August 2026</span></div></div>
+    <div class="past"><div><b>The Only Woman in the Room</b><span>Shreya Bajpai &middot; 9 October 2026</span></div><div><b>Open Decks &mdash; Afterglow &times; The Den</b><span>Major Minor, ELCOR b2b ANKTT, YXS, JAAXDIP, Nihaarika + The Late Shift &middot; 27 September 2026</span></div><div><b>Surviving the Industry</b><span>Major Minor &mdash; Chitralekha Sen &amp; Mukul Bhatt &middot; 27 September 2026</span></div><div><b>Mixing Without Overthinking</b><span>Rudransh Thakur &middot; 8 August 2026</span></div></div>
     <p class="stand" style="margin:18px 0 0;font-size:.95rem;">
       RSVP above and we will tell you the moment the next one is announced.
     </p>
@@ -417,7 +422,7 @@
       <div class="field">
         <label for="f-event">What for</label>
         <select id="f-event" name="event">
-          <option value="Masterclass - Shreya Bajpai - 9 Oct 2026">The Only Woman in the Room &mdash; 9 Oct</option>
+          <option value="Masterclass - interest">Masterclass &mdash; tell me when</option>
           <option value="Open Decks - interest">Open Decks &mdash; tell me when</option>
           <option value="Open Collab Days - interest">Open Collab Days &mdash; tell me when</option>
         </select>
@@ -448,7 +453,7 @@
   </div>
 
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
+    <span class="fine">The Grey Room &middot; <a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a> &middot; Noida</span>
     <span class="colo">
       <a class="fine igf" href="archive.html">Archive 01</a>
       <span class="fine" aria-hidden="true">&middot;</span>
@@ -460,7 +465,7 @@
 <script>
   var WHATSAPP_NUMBER = "919999731560";
   var SHEET_ENDPOINT  = "https://script.google.com/macros/s/AKfycbxrOCpE4qbX4s8pcHi2wt3LYliUhLPc9-1doybm3ppGMvZYNitX39Ofb4dK06j6IxHrrQ/exec";
-  var MASTERCLASS     = "Masterclass - Shreya Bajpai - 9 Oct 2026";
+  var MASTERCLASS     = "Masterclass - interest";
 
   // the two undated blocks preselect themselves in the form
   document.querySelectorAll(".also-btn").forEach(function (btn) {
