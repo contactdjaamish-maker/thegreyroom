@@ -224,6 +224,19 @@
   .dtabs button[aria-selected="true"]:hover { background: var(--grey); }
   .btabs { grid-template-columns: repeat(2, 1fr); }
   .btabs button { padding: 9px 4px; }
+  /* where we are */
+  .addr{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:-6px 0 18px;
+        font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;line-height:1.7;color:var(--dim);}
+  .addr a{color:var(--ink);white-space:nowrap;}
+  .maplink{color:inherit;text-decoration:underline;text-underline-offset:2px;
+           text-decoration-color:rgba(242,241,237,.35);}
+  .maplink:hover{text-decoration-color:var(--ink);}
+  .where{border:1px solid var(--line);padding:16px 18px;margin:0;}
+  .where b{display:block;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.14em;
+           text-transform:uppercase;color:var(--dim);margin-bottom:7px;}
+  .where span{display:block;font-size:.97rem;line-height:1.5;opacity:.88;}
+  .where a{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:10px;
+           letter-spacing:.13em;text-transform:uppercase;color:var(--ink);}
   @media print{
     .gridbg{display:none;} body{padding:0;} form,button,.wa-link,.status{display:none;}
     .phase,.spec div,.task{background:#2b2b2d !important;}
@@ -460,8 +473,14 @@
     </div>
   </div>
 
+  <section>
+    <p class="where"><b>Where</b><span>G-052, Raheja Vedaanta Tower GHI, Sector 108, Dharampur, near Dwarka Expressway, Gurugram, Haryana</span>
+      <a href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Open in Maps &rarr;</a></p>
+  </section>
+
   <footer>
-    <span class="fine">The Grey Room &middot; Gurugram &middot; Noida</span>
+    <span class="fine">The Grey Room &middot;
+      <a class="maplink" href="https://maps.app.goo.gl/BFbsn7bd8b5uBPsE7" target="_blank" rel="noopener">Gurugram</a> &middot; Noida</span>
     <span class="fine">Cancel up to 24 hours before</span>
   </footer>
 </div>
@@ -485,7 +504,7 @@
 <script>
 (function () {
   var ENDPOINT = "https://script.google.com/macros/s/AKfycbxk-18ZxUjDxxPYhAPyDGp2KPt3p6ZYmIMFIr3LGVL0kgirIjdlFjKfpt0EFk_OdEO1/exec";
-  var WA = "919999731560";
+  var WA = "919311804200";
   var DEMO = !ENDPOINT;
 
   var $ = function (id) { return document.getElementById(id); };
